@@ -1,4 +1,4 @@
-image: /home/focalfossa/catkin_ws/maps/scaled_map.pgm
+image: /home/saleeq/catkin_ws/src/roboconvoy/data/maps/scaled_map.pgm
 resolution: 0.050000
 origin: [-1,-1, 0.000000]
 negate: 0

@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import math
-
+import os.path
  
 #
 #  This is a start for the map program
@@ -53,7 +53,7 @@ def draw_point(event,x,y,flags,param):
       y1[1]=iy
       prompt = '> '
       print("What is the x distance in meters between the 2 points?") 
-      deltax = 3.048#float(input(prompt))
+      deltax = float(input(prompt))
       dx = math.sqrt((x1[1]-x1[0])**2 + (y1[1]-y1[0])**2)*.05
       sx = deltax / dx
       print("You will need to choose the y coordinates vertical with respect to each other")
@@ -65,7 +65,7 @@ def draw_point(event,x,y,flags,param):
     else:
       prompt = '> '
       print("What is the y distance in meters between the 2 points?") 
-      deltay = 3.048#float(input(prompt))
+      deltay = float(input(prompt))
       x1[3]=ix
       y1[3]=iy    
       dy = math.sqrt((x1[3]-x1[2])**2 + (y1[3]-y1[2])**2)*.05
@@ -74,7 +74,7 @@ def draw_point(event,x,y,flags,param):
       res = cv2.resize(image, None, fx=sx, fy=sy, interpolation = cv2.INTER_CUBIC)
       # Convert to grey
       res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-      cv2.imwrite("KEC_BuildingCorrected.pgm", res )
+      cv2.imwrite("KEC_BuildingCorrected.pgm", res );
       cv2.imshow("Image2", res)
       #for i in range(0,res.shape[1],20):
         #for j in range(0,res.shape[0],20):
@@ -84,23 +84,38 @@ def draw_point(event,x,y,flags,param):
       #cv2.imwrite("KEC_BuildingCorrectedDots.pgm",res)
         # Show the image in a new window
         #  Open a file
-      #prompt = '> '
+      prompt = '> '
       print("What is the name of the new map?")
-      #mapName = input(prompt)
-      mapName ="scaled_floor_plan"
+      mapName = input(prompt)
+ 
       prompt = '> '
       print("Where is the desired location of the map and yaml file?") 
       print("NOTE: if this program is not run on the TurtleBot, Please input the file location of where the map should be saved on TurtleBot. The file will be saved at that location on this computer. Please then tranfer the files to TurtleBot.")
-      mapLocation ="~/catkin_ws/src/roboconvoy_localization/data/map" #input(prompt)
-      completeFileNameMap = "~/catkin_ws/src/roboconvoy_localization/data/map/scaled_floor_plan.pgm"#os.path.join(mapLocation, mapName +".pgm")
-      completeFileNameYaml ="~/catkin_ws/src/roboconvoy_localization/data/map/scaled_floor_plan.yaml" #os.path.join(mapLocation, mapName +".yaml")
-      cv2.imwrite("scaled_map.pgm", res )
-    yaml = open(mapLocation)
-    print("opend")
-    
-    print("image: " + mapLocation + "/" + mapName + ".pgm\n")
-    print("resolution: 0.050000\n")
-    print("origin: [" + str(-1) + "," +  str(-1) + ", 0.000000]\n")
-    print("negate: 0\noccupied_thresh: 0.65\nfree_thresh: 0.196")
-    yaml.close()
-    
+      mapLocation = input(prompt)
+      completeFileNameMap = os.path.join(mapLocation, mapName +".pgm")
+      completeFileNameYaml = os.path.join(mapLocation, mapName +".yaml")
+      yaml = open(completeFileNameYaml, "w")
+      cv2.imwrite(completeFileNameMap, res );
+        #
+        # Write some information into the file
+        #
+      yaml.write("image: " + mapLocation + "/" + mapName + ".pgm\n")
+      yaml.write("resolution: 0.050000\n")
+      yaml.write("origin: [" + str(-1) + "," +  str(-1) + ", 0.000000]\n")
+      yaml.write("negate: 0\noccupied_thresh: 0.65\nfree_thresh: 0.196")
+      yaml.close()
+      exit()
+ 
+cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+cv2.setMouseCallback('image',draw_point)
+#
+#  Waiting for a Esc hit to quit and close everything
+#
+while(1):
+  cv2.imshow('image',image)
+  k = cv2.waitKey(20) & 0xFF
+  if k == 27:
+    break
+  elif k == ord('a'):
+    print('Done')
+cv2.destroyAllWindows()
