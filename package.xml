@@ -2,7 +2,7 @@
 <package>
   <name>pf_localisation</name>
   <version>0.0.0</version>
-  <description>The pf_localisation package</description>
+  <description>The roboconvoy package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
