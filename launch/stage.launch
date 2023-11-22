@@ -1,0 +1,29 @@
+<launch>
+    <param name="/use_sim_time" value="true"/>
+    <!-- Run simulation in stage-->
+    <node name="stage" pkg="stage_ros" type="stageros" args="$(find pf_localisation)/data/generated_data/floor_plan.world"/>
+
+    <!-- Run map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find pf_localisation)/data/sim_data/scaled_floor_plan.yaml"/>
+    
+    <!-- To Run slam gmapping uncomment below-->
+    <!--node name="slam" pkg="gmapping" type="slam_gmapping" args="scan:=base_scan"-->
+        <!-- To receive less warnings but get less publications. See: http://wiki.ros.org/gmapping-->
+        <!--param name="transform_publish_period" value="0.08"/-->
+    <!--/node-->
+
+    <!--We are using AMCL for the assignment-->
+    <!-- Run AMCL Localisation node-->
+    <!--node name="amcl" pkg="amcl" type="amcl" args="scan:=base_scan"/-->
+  
+    <!-- Run rviz for visualisation-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find pf_localisation)/config/demo.rviz"/>
+
+    <!-- Keyboard telop implimentation-->
+    <node pkg="pr2_teleop" type="teleop_pr2_keyboard" name="spawn_teleop_keyboard" output="screen">
+      <param name="walk_vel" value="0.5" />
+      <param name="run_vel" value="1.0" />
+      <param name="yaw_rate" value="1.0" />
+      <param name="yaw_run_rate" value="1.5" />
+    </node>
+</launch>
