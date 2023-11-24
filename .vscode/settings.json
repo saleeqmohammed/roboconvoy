@@ -6,5 +6,7 @@
     "python.analysis.extraPaths": [
         "/home/saleeq/catkin_ws/devel/lib/python3/dist-packages",
         "/opt/ros/noetic/lib/python3/dist-packages"
-    ]
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "basic"
 }

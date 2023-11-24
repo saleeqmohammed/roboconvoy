@@ -1,4 +1,4 @@
-image: /home/saleeq/catkin_ws/src/roboconvoy/dat/generated_data/new_map_clean.pgm
+image: /home/saleeq/catkin_ws/src/roboconvoy/dat/generated_data/new_map.pgm
 resolution: 0.050000
 origin: [-1,-1, 0.000000]
 negate: 0
