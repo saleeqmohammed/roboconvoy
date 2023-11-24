@@ -21,6 +21,7 @@ from threading import Lock
 import sys
 from copy import deepcopy
 
+
 class ParticleFilterLocalisationNode(object):
     def __init__(self):
         rospy.loginfo("Waiting for a map...")
