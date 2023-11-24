@@ -5,8 +5,7 @@ import cv2 # Import OpenCV
 img = cv2.imread('data/map/floor_plan_2_binary.png')
 print(img)
 cv2.imshow("original",img)
-ret, bw_img = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
-   
+ret, bw_img = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)   
 # converting to its binary form
 bw = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY)
   
