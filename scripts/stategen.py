@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import math
-import datamanagement
 def find_first_last_nonzero_indices(matrix):
     # Convert the matrix to a NumPy array
     matrix = np.array(matrix)
@@ -81,7 +80,6 @@ def state_matrix_generator(map_img):
 image_path = "/home/saleeq/catkin_ws/src/roboconvoy/data/states/new_map.pgm"
 result = trim_whitespace(image_path)
 state_matrix =state_matrix_generator(result)
-datamanagement.save_object(state_matrix,"/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents")
 
 if result is not None:
     # Display the original and modified images
