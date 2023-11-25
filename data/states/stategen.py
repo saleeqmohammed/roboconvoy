@@ -1,3 +1,4 @@
+from tokenize import String
 import cv2
 import numpy as np
 import math
@@ -72,10 +73,13 @@ def state_matrix_generator(map_img):
                 cv2.rectangle(image_bgr,(start_x,start_y),(end_x,end_y),(0,100,0),1)
                 state_matrix[cell_x,cell_y]=1
             else:
-                cv2.rectangle(image_bgr,(start_x,start_y),(end_x,end_y),(0,0,100),-1)
-    cv2.imshow("grid",image_bgr)
+                #cv2.rectangle(image_bgr,(start_x,start_y),(end_x,end_y),(0,0,100),-1)
+                #no need to do anything unless plotting rectangles since initialized with 0s.
+                pass
     
-    cv2.imwrite("/home/saleeq/catkin_ws/src/roboconvoy/data/states/grid_map.bmp",image_bgr)
+    # cv2.imshow("grid",image_bgr)
+    
+    #cv2.imwrite("/home/saleeq/catkin_ws/src/roboconvoy/data/states/grid_map.bmp",image_bgr)
     return state_matrix
 
 image_path = "/home/saleeq/catkin_ws/src/roboconvoy/data/states/new_map.pgm"
@@ -84,9 +88,13 @@ state_matrix =state_matrix_generator(result)
 datamanagement.save_object(state_matrix,"/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents")
 
 if result is not None:
-    # Display the original and modified images
+    # Display the original and modified images 
     cv2.imshow("Original Image", cv2.imread(image_path, cv2.IMREAD_GRAYSCALE))
     cv2.imshow("Modified Image", result)
     #print(result)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+def get_states(map_image_path: String): # type: ignore
+    trimmed_image = trim_whitespace(map_image_path)
+    state_matrix =state_matrix_generator(trimmed_image)
+    return state_matrix

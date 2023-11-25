@@ -4,8 +4,8 @@ from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup(
-   packages=['pf_localisation'],
-   package_dir={'': 'src'}
+   packages=['pf_localisation','pomdp'],
+   package_dir={'': 'src','': 'src'}
 )
 
 setup(**d)
