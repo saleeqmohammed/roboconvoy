@@ -98,3 +98,4 @@ def get_states(map_image_path: String): # type: ignore
     return state_matrix
 get_states(image_path)
 cv2.waitKey(0)
+cv2.destroyAllWindows()

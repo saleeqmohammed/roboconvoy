@@ -93,9 +93,10 @@ if result is not None:
     cv2.imshow("Original Image", cv2.imread(image_path, cv2.IMREAD_GRAYSCALE))
     cv2.imshow("Modified Image", result)
     #print(result)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 def get_states(map_image_path: String): # type: ignore
     trimmed_image = trim_whitespace(map_image_path)
     state_matrix =state_matrix_generator(trimmed_image)
     return state_matrix
+cv2.destroyAllWindows()
