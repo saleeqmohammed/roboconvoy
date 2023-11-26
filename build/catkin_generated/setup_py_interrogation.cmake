@@ -1,0 +1,7 @@
+set(roboconvoy_localization_SETUP_PY_SETUP_MODULE "distutils.core")
+set(roboconvoy_localization_SETUP_PY_VERSION "0.0.0")
+set(roboconvoy_localization_SETUP_PY_SCRIPTS "")
+set(roboconvoy_localization_SETUP_PY_PACKAGES "pf_localisation;pomdp;tools")
+set(roboconvoy_localization_SETUP_PY_PACKAGE_DIRS "src/pf_localisation;src/pomdp;src/tools")
+set(roboconvoy_localization_SETUP_PY_MODULES "")
+set(roboconvoy_localization_SETUP_PY_MODULE_DIRS "")

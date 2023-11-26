@@ -9,5 +9,8 @@
         "./src"
     ],
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "python.languageServer": "Default",
+    "python.analysis.autoSearchPaths": true,
+    "python.autoComplete.extraPaths": ["/usr/lib/python3.8/site-packages"]
 }

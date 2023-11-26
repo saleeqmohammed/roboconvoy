@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 import cv2
-import data.states.datamanagement as datamanagement
+import tools.datamanagement as datamanagement
 import numpy as np
 import math
-from pomdp.state_generator import get_states #type: ignore
+from pomdp.state_space_generator import get_states #type: ignore
 
 state_matrix = None
 #get state matrix from serialised file or otherwise
 try:
-    state_matrix =datamanagement.load_object("data/states/state_matrix_induvidual_agents.pickle")
+    state_matrix =datamanagement.load_object("/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents.pickle")
 except:
     state_matrix=get_states("data/states/new_map.pgm")
 print(state_matrix)

@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/saleeq/catkin_ws/src/roboconvoy/build/devel/setup.sh

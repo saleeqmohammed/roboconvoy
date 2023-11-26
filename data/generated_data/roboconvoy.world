@@ -61,8 +61,8 @@ window
 
 floorplan
 ( 
-  name "scaled_map"
-  bitmap "new_map.pgm"
+  name "final_map"
+  bitmap "final_map.pgm"
   size [20.0 40.0 0.5]
   pose [ 0 0 0 0 ]
 )
