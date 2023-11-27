@@ -211,7 +211,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=roboconvoy_localization
+CMAKE_PROJECT_NAME:STATIC=roboconvoy
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=1.10.0
@@ -474,6 +474,12 @@ message_runtime_DIR:PATH=/opt/ros/noetic/share/message_runtime/cmake
 
 //The directory containing a CMake configuration file for nav_msgs.
 nav_msgs_DIR:PATH=/opt/ros/noetic/share/nav_msgs/cmake
+
+//Value Computed by CMake
+roboconvoy_BINARY_DIR:STATIC=/home/saleeq/catkin_ws/src/roboconvoy/build
+
+//Value Computed by CMake
+roboconvoy_SOURCE_DIR:STATIC=/home/saleeq/catkin_ws/src/roboconvoy
 
 //Value Computed by CMake
 roboconvoy_localization_BINARY_DIR:STATIC=/home/saleeq/catkin_ws/src/roboconvoy/build

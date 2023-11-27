@@ -1,0 +1,8 @@
+prefix=/home/saleeq/catkin_ws/src/roboconvoy/build/devel
+
+Name: roboconvoy
+Description: Description of roboconvoy
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,18 +1,19 @@
 <launch>
     <!-- Run simulation in stage-->
-    <node name="stage" pkg="stage_ros" type="stageros" args="$(find roboconvoy_localization)/data/generated_data/meeting.world">
+    <node name="stage" pkg="stage_ros" type="stageros" args="$(find roboconvoy_localization)/data/generated_data/roboconvoy_single_bot.world">
     <param name="transform_publish_period" value="0.08"/>
     </node>
     <!--change back to roboconvoy.world after tests-->
+      <!--To Run slam gmapping-->
+ <!--    <node name="slam" pkg="gmapping" type="slam_gmapping" args="scan:=base_scan"> -->
+        <!-- To receive less warnings but get less publications. See: http://wiki.ros.org/gmapping-->
+      <!--   <param name="transform_publish_period" value="0.08"/>
+    </node> -->
 
     <!-- Run map server -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy_localization)/data/sim_data/meeting.yaml"/>
+    <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy_localization)/data/sim_data/final_map.yaml"/> -->
     
-    <!--To Run slam gmapping uncomment below-->
-<!--     <node name="slam" pkg="gmapping" type="slam_gmapping" args="scan:=base_scan"> -->
-        <!-- To receive less warnings but get less publications. See: http://wiki.ros.org/gmapping-->
-        <!-- <param name="transform_publish_period" value="0.08"/>
-    </node> -->
+
 
     <!--We are using AMCL for the assignment-->
     <!-- Run AMCL Localisation node-->

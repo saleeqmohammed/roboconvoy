@@ -1,4 +1,4 @@
-import imp
+
 from tokenize import String
 import cv2
 import numpy as np
@@ -99,4 +99,3 @@ def get_states(map_image_path: String): # type: ignore
     trimmed_image = trim_whitespace(map_image_path)
     state_matrix =state_matrix_generator(trimmed_image)
     return state_matrix
-cv2.destroyAllWindows()

@@ -133,18 +133,18 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoy_localization.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoy.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roboconvoy_localization/cmake" TYPE FILE FILES
-    "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoy_localizationConfig.cmake"
-    "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoy_localizationConfig-version.cmake"
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roboconvoy/cmake" TYPE FILE FILES
+    "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoyConfig.cmake"
+    "/home/saleeq/catkin_ws/src/roboconvoy/build/catkin_generated/installspace/roboconvoyConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roboconvoy_localization" TYPE FILE FILES "/home/saleeq/catkin_ws/src/roboconvoy/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roboconvoy" TYPE FILE FILES "/home/saleeq/catkin_ws/src/roboconvoy/package.xml")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
