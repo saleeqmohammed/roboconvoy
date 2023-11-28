@@ -9,7 +9,8 @@
     <arg name="world_name" value="$(find roboconvoy)/data/generated_data/3dworlds/newmodel.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="true"/>
+    <!--set to true to visualize-->
+    <arg name="gui" value="false"/>
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
@@ -27,7 +28,16 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
 
   <!-- Include gmapping launch file -->
-  <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch">
-    <!-- Add any additional arguments or parameters if needed -->
+  <!-- <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"> -->
+  <!--node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy)/data/generated_data/maps_for_server/map_3d_00.yaml"/-->
+    <arg name="map_file" default="$(find roboconvoy)/data/generated_data/maps_for_server/map_3d_00.yaml" />
+
+  <!-- Launch Gazebo and TurtleBot3 Navigation -->
+  
+  <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch">
+    <arg name="map_file" value="$(arg map_file)" />
   </include>
+  <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
+    <!-- Add any additional arguments or parameters if needed -->
+  <!-- </include> -->
 </launch>

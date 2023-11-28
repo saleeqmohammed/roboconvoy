@@ -6,10 +6,11 @@
   <arg name="z_pos" default="0.0"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find roboconvoy)//home/saleeq/catkin_ws/src/roboconvoy/data/generated_data/3dworlds/newmodel.world"/>
+    <arg name="world_name" value="$(find roboconvoy)/data/generated_data/3dworlds/newmodel.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="true"/>
+    <!--set to true to visualize-->
+    <arg name="gui" value="false"/>
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
@@ -29,6 +30,7 @@
   <!-- Include gmapping launch file -->
   <!-- <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"> -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy)/data/generated_data/maps_for_server/map_3d_00.yaml"/>
+  <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
     <!-- Add any additional arguments or parameters if needed -->
   <!-- </include> -->
 </launch>

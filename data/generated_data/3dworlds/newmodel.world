@@ -1,5 +1,10 @@
 <sdf version='1.4'>
   <world name='default'>
+  <!--Add a reference frame-->
+   <frame name="global_fixed_frame">
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
