@@ -6,7 +6,11 @@
   <arg name="z_pos" default="0.0"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
+<<<<<<< HEAD
     <arg name="world_name" value="$(find roboconvoy)/data/generated_data/3dworlds/newmodel.world"/>
+=======
+    <arg name="world_name" value="$(find roboconvoy)//home/alanb1/catkin_ws/src/roboconvoy/data/generated_data/3dworlds/newmodel.world"/>
+>>>>>>> 113ce68b64e34e998cc2590e104f660885bf463a
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <!--set to true to visualize-->

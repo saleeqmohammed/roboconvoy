@@ -80,13 +80,13 @@ def state_matrix_generator(map_img):
     
     # cv2.imshow("grid",image_bgr)
     
-    #cv2.imwrite("/home/saleeq/catkin_ws/src/roboconvoy/data/states/grid_map.bmp",image_bgr)
+    #cv2.imwrite("/home/alanb1/catkin_ws/src/roboconvoy/data/states/grid_map.bmp",image_bgr)
     return state_matrix
 
-image_path = "/home/saleeq/catkin_ws/src/roboconvoy/data/states/new_map.pgm"
+image_path = "/home/alanb1/catkin_ws/src/roboconvoy/data/states/new_map.pgm"
 result = trim_whitespace(image_path)
 state_matrix =state_matrix_generator(result)
-datamanagement.save_object(state_matrix,"/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents")
+datamanagement.save_object(state_matrix,"/home/alanb1/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents")
 
 if result is not None:
     # Display the original and modified images 

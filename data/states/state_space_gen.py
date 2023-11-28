@@ -38,6 +38,7 @@ def trim_whitespace(image_path):
     y2 = bottom_right[1]
     
     #print(bin_image)
+    cv2.imshow("trimmed image",img[x:x2,y:y2])
     return img[x:x2,y:y2]
 # Example usage
 def calculate_grid_size(img_map):
@@ -48,7 +49,7 @@ def calculate_grid_size(img_map):
     return i
 
 def state_matrix_generator(map_img):
-    grid= calculate_grid_size(map_img)
+    grid= 4#calculate_grid_size(map_img)
     map_dim = map_img.shape
     x_dim =map_dim[1]
     y_dim =map_dim[0]
@@ -79,10 +80,10 @@ def state_matrix_generator(map_img):
                 pass
     
     cv2.imshow("grid",image_bgr)
-    cv2.imwrite("/home/saleeq/catkin_ws/src/roboconvoy/data/states/grid_map.png",image_bgr)
+    cv2.imwrite("/home/alanb1/catkin_ws/src/roboconvoy/data/states/grid_map.png",image_bgr)
     return state_matrix
 
-image_path = "/home/saleeq/catkin_ws/src/roboconvoy/data/states/final_map.pgm"
+image_path = "/home/alanb1/catkin_ws/src/roboconvoy/data/states/map_3d_stagegenerated_base.pgm"
 
 def display_maps(result):
     if result is not None:
@@ -93,7 +94,8 @@ def display_maps(result):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 def get_states(map_image_path: String): # type: ignore
-    trimmed_image = trim_whitespace(map_image_path)
+    trimmed_image = cv2.imread(map_image_path,cv2.IMREAD_GRAYSCALE)#trim_whitespace(map_image_path)
+    cv2.imshow("trim",trimmed_image)
     state_matrix =state_matrix_generator(trimmed_image)
     return state_matrix
 get_states(image_path)
