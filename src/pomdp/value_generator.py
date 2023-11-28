@@ -8,7 +8,7 @@ from pomdp.state_space_generator import get_states #type: ignore
 state_matrix = None
 #get state matrix from serialised file or otherwise
 try:
-    state_matrix =datamanagement.load_object("/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents.pickle")
+    state_matrix =datamanagement.load_object("/home/alanb1/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents.pickle")
 except:
     state_matrix=get_states("data/states/new_map.pgm")
 print(state_matrix)

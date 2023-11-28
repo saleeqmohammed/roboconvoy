@@ -11,7 +11,7 @@ from copy import deepcopy
 state_matrix = None
 #get state matrix from serialised file or otherwise
 try:
-    state_matrix =datamanage.load_object("/home/saleeq/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents.pickle")
+    state_matrix =datamanage.load_object("/home/alanb1/catkin_ws/src/roboconvoy/data/states/state_matrix_induvidual_agents.pickle")
 except:
     state_matrix=get_states("data/states/new_map.pgm")
 
