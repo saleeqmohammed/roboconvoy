@@ -2,7 +2,7 @@ from tokenize import String
 import cv2
 import numpy as np
 import math
-import datamanagement
+import tools.datamanagement as datamanagement
 map_resolution = 0.05000000074505806
 import matplotlib.pyplot as plt
 
@@ -62,8 +62,8 @@ def state_matrix_generator(map_img):
     y_dim = map_dim[0]
     n_cells_x = math.ceil(x_dim / grid)
     n_cells_y = math.ceil(y_dim / grid)
-    print(n_cells_x)
-    print(n_cells_y)
+    #print(n_cells_x)
+    #print(n_cells_y)
     state_matrix = np.zeros((n_cells_x, n_cells_y))
     centers_dict = {}  # Dictionary to store centers as keys and state_matrix[cell_x, cell_y] as values
 
@@ -91,7 +91,7 @@ def state_matrix_generator(map_img):
                 cv2.circle(image_bgr, (center_x, center_y), 2, (0, 0, 255), -1)  # Add a dot at the center
                 state_matrix[cell_x, cell_y] = 1
                 centers_dict[(center_x*map_resolution, center_y*map_resolution)] = 1
-                img_references[n_cell]=(center_y*map_resolution,center_x*map_resolution)
+                img_references[n_cell]=(center_x*map_resolution, center_y*map_resolution)
                 #add labels
                 label = f's{n_cell}'
                 n_cell+=1
@@ -123,12 +123,14 @@ def display_maps(result):
 def get_states(map_image_path: String):  # type: ignore
     trimmed_image = trim_whitespace(map_image_path)
     state_matrix, centers_dict ,img_ref= state_matrix_generator(trimmed_image)
+    state_matrix = state_matrix.T 
+    state_matrix = state_matrix[1:-1,1:-1]
     return state_matrix, centers_dict,img_ref
 
 
 image_path = "/home/saleeq/Desktop/new_map_planning_1.png"
 
-state_matrix, centers_dict,img_ref = get_states(image_path)
+""" state_matrix, centers_dict,img_ref = get_states(image_path)
 
 # Print centers as a dictionary
 print("Centers Dictionary:", centers_dict)
@@ -139,5 +141,4 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 datamanagement.save_object(beliefstates,"/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/beliefstates")
 datamanagement.save_object(img_ref,"/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/beliefstate_reference")
-datamanagement.save_object(state_matrix,"/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/availability_matrix")
-print(img_ref)
+datamanagement.save_object(state_matrix,"/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/availability_matrix") """
