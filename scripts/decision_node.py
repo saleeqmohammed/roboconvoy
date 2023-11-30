@@ -1,40 +1,28 @@
-#!/usr/bin/python3
-import cv2
 import datamanagement
-import numpy as np
-import math
-from pomdp.state_generator import get_states #type: ignore
+states = datamanagement.load_object("src/pomdp/beliefstates.pickle")
+beliefstate_reference = datamanagement.load_object("src/pomdp/beliefstate_reference.pickle")
 
-state_matrix = None
-#get state matrix from serialised file or otherwise
-try:
-    state_matrix =datamanagement.load_object("data/states/state_matrix_induvidual_agents.pickle")
-except:
-    state_matrix=get_states("data/states/new_map.pgm")
-print(state_matrix)
+#we have states, but given target state/ goal state to keep the object in , what is the new belief states/available states?
+#not necessasry: bots need to make it to the target.
+
+#Transitions
 """
-cv2.imshow("sm",state_matrix)
-cv2.waitKey(0)
-cv2.destroyAllWindows() 
+
+        |S| x |A| x |S|
+         s     a     s'
+         T[s][a][s'] -> P(s'|a,s)
+
+Lay a few ground rules to define this
+if we try to move to impossible state (moving up at topmost) -> 0
+successful transition has 88% probability ? (need to model)
+rest 15% divided with 5% right 5% left 2% bottom in case of up. set similar rules.
 """
-def euclidian_value(x1,y1,tupx2y2):
-    return math.sqrt((x1-tupx2y2[0])**2+(y1-tupx2y2[1])**2)
 
 
-def get_values(state_matrix,tgt_state):
-    #initialize value matrix
-    value_matrix = np.zeros_like(state_matrix)
-    dims = state_matrix.shape
-    n_x = dims[0]
-    n_y = dims[1]
-    for i in range(n_x):
-        for j in range(n_y):
-            if state_matrix[i,j]!=0:
-                value_matrix[i,j]=-euclidian_value(i,j,tgt_state) #type: ignore
-            else:
-                value_matrix[i,j]=-10000 #type: ignore
-    value_matrix[tgt_state[0],tgt_state[1]]=100 # type: ignore
-    return value_matrix
 
-tgt_state =(20,10)
-value_matrix =get_values(state_matrix,tgt_state)
+#rewards R(s,a) return the cost of taking actino a at given current state s
+#as per model we need to return 
+def get_rewards(beliefstates,beliefstate_reference,n_start ,n_target):
+    #coordinates are states 
+    goal_coordinates = beliefstate_reference[n_target]
+    current_belif_coordinates = cur
