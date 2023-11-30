@@ -4,6 +4,11 @@ import cv2
 import numpy as np
 import math
 import datamanagement
+
+map_resolution =0.05000000074505806
+import matplotlib.pyplot as plt
+
+
 def find_first_last_nonzero_indices(matrix):
     # Convert the matrix to a NumPy array
     matrix = np.array(matrix)
@@ -49,7 +54,7 @@ def calculate_grid_size(img_map):
     return i
 
 def state_matrix_generator(map_img):
-    grid= 4#calculate_grid_size(map_img)
+    grid= 16#calculate_grid_size(map_img)
     map_dim = map_img.shape
     x_dim =map_dim[1]
     y_dim =map_dim[0]
@@ -64,26 +69,32 @@ def state_matrix_generator(map_img):
     padded_map = np.ones((pixels_y,pixels_x), dtype=np.uint8) * 255 # type: ignore
     padded_map[:y_dim,:x_dim] = map_img
     image_bgr = cv2.cvtColor(padded_map, cv2.COLOR_GRAY2BGR)
+    pixel_coords =[]
     for cell_y in range(n_cells_y):
         for cell_x in range(n_cells_x):
             start_x =cell_x*grid
             start_y =cell_y*grid
             end_x =(cell_x+1)*grid
             end_y =(cell_y+1)*grid
-            if np.sum(padded_map[start_y:end_y,start_x:end_x]) >(255*grid**2 -1):
+            #pixel_coords.append((map_resolution*(cell_x-0.5)*grid,map_resolution*(cell_y-0.5)*grid))
+            if np.sum(padded_map[start_y:end_y,start_x:end_x]) >(255*grid**2 -1)*0.99:
                 #allowed cells
                 cv2.rectangle(image_bgr,(start_x,start_y),(end_x,end_y),(0,100,0),1)
                 state_matrix[cell_x,cell_y]=1
+                pixel_coords.append((map_resolution*(cell_x-0.5)*grid,map_resolution*(cell_y-0.5)*grid,1))
             else:
                 cv2.rectangle(image_bgr,(start_x,start_y),(end_x,end_y),(0,0,100),-1)
+                pixel_coords.append((map_resolution*(cell_x-0.5)*grid,map_resolution*(cell_y-0.5)*grid,0))
                 #no need to do anything unless plotting rectangles since initialized with 0s.
                 pass
     
+    image_bgr =image_bgr[grid:-grid,grid:-grid]
     cv2.imshow("grid",image_bgr)
-    cv2.imwrite("/home/alanb1/catkin_ws/src/roboconvoy/data/states/grid_map.png",image_bgr)
-    return state_matrix
+    cv2.imwrite("/home/saleeq/Desktop/grid_map.png",image_bgr)
+    state_matrix=state_matrix[1:-1,1:-1]
+    return state_matrix,pixel_coords,(n_cells_x,n_cells_y)
 
-image_path = "/home/alanb1/catkin_ws/src/roboconvoy/data/states/map_3d_stagegenerated_base.pgm"
+image_path = "/home/saleeq/Desktop/new_map_planning.png"
 
 def display_maps(result):
     if result is not None:
@@ -94,10 +105,24 @@ def display_maps(result):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 def get_states(map_image_path: String): # type: ignore
-    trimmed_image = cv2.imread(map_image_path,cv2.IMREAD_GRAYSCALE)#trim_whitespace(map_image_path)
+    trimmed_image = trim_whitespace(map_image_path)
     cv2.imshow("trim",trimmed_image)
     state_matrix =state_matrix_generator(trimmed_image)
     return state_matrix
-get_states(image_path)
+state_matrix ,image_representation,img_rep_dim= get_states(image_path)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+image_representation = np.array(image_representation)
+image_representation.reshape(img_rep_dim)
+image_representation=image_representation[1:-1,1:-1]
+image_representation.reshape(image_representation.shape[0]*image_representation.shape[1])
+for points in image_representation:
+    if points[2]:
+        #plt.scatter(points[1],points[0],color='blue')
+        pass
+    else:
+        plt.scatter(points[1],points[0],color='gray')
+        pass
+
+
+plt.show()

@@ -27,7 +27,7 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
 
   <!-- Include gmapping launch file -->
-  <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch">
+<!--   <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"> -->
     <!-- Add any additional arguments or parameters if needed -->
   </include>
 </launch>
