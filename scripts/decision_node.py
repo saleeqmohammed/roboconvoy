@@ -1,13 +1,20 @@
 import datamanagement
 states = datamanagement.load_object("src/pomdp/beliefstates.pickle")
 beliefstate_reference = datamanagement.load_object("src/pomdp/beliefstate_reference.pickle")
-
+"""
+        STATES
+        states are defined as coordinates of center of grid cells
+"""
 #we have states, but given target state/ goal state to keep the object in , what is the new belief states/available states?
 #not necessasry: bots need to make it to the target.
-
-#Transitions
 """
+        ACTIONS
+"""
+actions =['up','down','right','left']
 
+"""
+        TRANSISIONS
+        
         |S| x |A| x |S|
          s     a     s'
          T[s][a][s'] -> P(s'|a,s)
