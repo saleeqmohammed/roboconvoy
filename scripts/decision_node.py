@@ -2,6 +2,7 @@ import datamanagement
 import pomdp.pbvi
 import pomdp.belief_state_gen as beliefgen
 import numpy as np
+import pomdp.transition_s_a_sp as transition
 #states = datamanagement.load_object("src/pomdp/beliefstates.pickle")
 #beliefstate_reference = datamanagement.load_object("src/pomdp/beliefstate_reference.pickle")
 """
@@ -41,6 +42,9 @@ if we try to move to impossible state (moving up at topmost) -> 0
 successful transition has 88% probability ? (need to model)
 rest 15% divided with 5% right 5% left 2% bottom in case of up. set similar rules.
 """
+#0 up 1 down 2 right 3 left
+T =transition.getTransitions()
+print(T[3][3][2])
 
 """
         R(s,a)

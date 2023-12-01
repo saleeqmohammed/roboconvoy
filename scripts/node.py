@@ -52,7 +52,7 @@ class ParticleFilterLocalisationNode(object):
         
         self._particle_filter.set_map(occupancy_map)
         
-        self._laser_subscriber = rospy.Subscriber("/base_scan", LaserScan,
+        self._laser_subscriber = rospy.Subscriber("/scan", LaserScan,
                                                   self._laser_callback,
                                                   queue_size=1)
         self._initial_pose_subscriber = rospy.Subscriber("/initialpose",
