@@ -110,7 +110,7 @@ class PFLocaliserBase(object):
             currentTime = rospy.Time.now()
             
             # ----- Given new estimated pose, now work out the new transform
-            self.recalculate_transform(currentTime)
+            #self.recalculate_transform(currentTime)
             # ----- Insert correct timestamp in particlecloud and estimatedpose,
             # ----- so extending subclasses don't need to worry about this, but can
             # ----- just concentrate on updating actual particle and pose locations
@@ -242,13 +242,13 @@ class PFLocaliserBase(object):
                 distance_travelled = distance_travelled * -1
             
             # ----- Update each particle with change in position (plus noise)
-            for p in self.particlecloud.poses:
+            """ for p in self.particlecloud.poses:
                 
                 rnd = random.normalvariate(0, 1)
                 
                 # ----- Rotate particle according to odometry rotation, plus  noise
-                p.orientation = (rotateQuaternion(p.orientation,
-                                                  dif_heading + rnd * dif_heading * self.ODOM_ROTATION_NOISE))
+                #p.orientation = (rotateQuaternion(p.orientation,
+                                                  #dif_heading + rnd * dif_heading * self.ODOM_ROTATION_NOISE))
                 
                 # ----- Get particle's new orientation
                 theta = getHeading(p.orientation)
@@ -259,7 +259,7 @@ class PFLocaliserBase(object):
                 p.position.x = (p.position.x + travel_x +
                                 (rnd * travel_x * self.ODOM_TRANSLATION_NOISE))
                 p.position.y = (p.position.y + travel_y +
-                                (rnd * travel_y * self.ODOM_DRIFT_NOISE))
+                                (rnd * travel_y * self.ODOM_DRIFT_NOISE)) """
     
         return time.time() - t
     

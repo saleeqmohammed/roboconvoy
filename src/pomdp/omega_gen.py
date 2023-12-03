@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from gazebo_msgs.srv import SpawnModel
@@ -26,11 +26,12 @@ def spawn_turtlebot3(instance_number):
     model_xml_str = model_xml.decode('utf-8')
 
     spawn_model = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
-
+    locations=[(-2,-5,0),(2,-5,0),(0,0,0)]
     turtlebot3_pose = Pose()
-    turtlebot3_pose.position.x = instance_number * 1.5  # Adjust the x-coordinate based on the instance number
-    turtlebot3_pose.position.y = 0.0
-    turtlebot3_pose.position.z = 0.0
+    lock=locations[instance_number]
+    turtlebot3_pose.position.x =lock[0]  # Adjust the x-coordinate based on the instance number
+    turtlebot3_pose.position.y =lock[1]
+    turtlebot3_pose.position.z =lock[2]
 
     model_name = "turtlebot3_" + str(instance_number)
 
@@ -41,10 +42,11 @@ def spawn_turtlebot3(instance_number):
         rospy.logerr("Error while spawning TurtleBot3 instance {}: {}".format(instance_number, str(e)))
 
 if __name__ == '__main__':
-    num_instances = 10  # Change this to the desired number of TurtleBot3 instances
+    num_instances = 3  # Change this to the desired number of TurtleBot3 instances
 
     for i in range(num_instances):
         try:
             spawn_turtlebot3(i)
         except rospy.ROSInterruptException:
             pass
+ 

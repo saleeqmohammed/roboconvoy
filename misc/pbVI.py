@@ -31,17 +31,18 @@ import math
 
 import numpy as np
 
-
-def generator(apbvi, V, B, horizon):
+def generator(apbvi, V, B, horizon,actual_observations_generator):
     while True:
         for _ in range(horizon):
             Gamma       = apbvi.Gamma(V)
             Epsi        = apbvi.Epsi(B, Gamma)
             V, best_as  = apbvi.V(Epsi, B)
 
-        yield V, best_as
-
-        B = apbvi.expanded_B(B)
+        yield V, best_as,Gamma,Epsi
+        
+        actual_observation =next(actual_observations_generator)
+        #print(actual_observation)
+        B = apbvi.expanded_B(B,actual_observation)
 
 
 def best_action(b, V, best_as):
@@ -105,6 +106,7 @@ def _Psi(T, Omega):
         |O| x |S| x |A|
         ot+1   st   at+1
     """
+    print(Omega.shape)
     (n_a, n_s, n_o) = Omega.shape
     res = np.empty((n_o, n_s, n_a))
     for (ot1, st, at1), _ in np.ndenumerate(res):
@@ -220,7 +222,7 @@ class PBVI(object):
     # (RM 2017-09-27)
     # MAYBE TODO: See if it makes sense to return the E in a different shape, so
     # we don't have to do the swapaxes later. (RM 2017-09-18)
-    """     def V(self, Epsi, B):
+    def V(self, Epsi, B):
         l = self._outs['V']
         Epsi = Epsi.swapaxes(0,1)
 
@@ -237,40 +239,20 @@ class PBVI(object):
         # The np.unique is the pruning step.
         # Requires NumPy >=1.13.0!
 
-        return rV, l['best_as'][a_inds] """
-        # Replace the existing V method in pbvi.py with this updated version
+        return rV, l['best_as'][a_inds]
 
-# Replace the existing V method in pbvi.py with this updated version
+    def update_belief(self, belief, action, obs):
+        m = self.i  #'i' represents the Input namedtuple
 
-# Replace the existing V method in pbvi.py with this updated version
+        b_new = np.zeros_like(belief)
+        for s_prime in range(self.n.s):  #'n' represents the Size namedtuple
+            p_s_prime = sum(m.T[s, action, s_prime] * belief[s] for s in range(self.n.s))
+            p_o_given_s_prime = m.Omega[action, s_prime, obs]
+            b_new[s_prime] = p_s_prime * p_o_given_s_prime
 
-    def V(self, Epsi, B):
-        l = self._outs['V']
-        Epsi = Epsi.swapaxes(0, 1)
-
-        # Note: Does anyone know how to short this? Essentially it's a
-        # broadcast matrix-vector multiplication.
-        l['product'] = np.multiply(Epsi, B[:, None, :], out=l.get('product'))
-
-        if len(l['product'].shape) == 1:
-            l['values'] = l['product']
-        else:
-            l['values'] = np.sum(l['product'], -1, out=l.get('values'))
-
-        if len(l['values'].shape) == 1:
-            l['best_as'] = np.argmax(l['values'])
-        else:
-            l['best_as'] = np.argmax(l['values'], axis=1, out=l.get('best_as'))
-
-        rV, a_inds = np.unique(Epsi[np.arange(Epsi.shape[0]), l['best_as']],
-                            return_index=True, axis=0)
-        # The np.unique is the pruning step.
-        # Requires NumPy >=1.13.0!
-
-        return rV, l['best_as']
-
-
-
+        # Normalize the updated belief
+        b_new /= np.sum(b_new)
+        return b_new
 
 
     # MAYBE TODO: Use broadcasting for calculating the Tb_prod etc. for all bs.
@@ -278,40 +260,24 @@ class PBVI(object):
     # TODO: Check whether the min_dists[…] > 0 makes sense numerically. If it's
     # close to 0 relative to the size of the space we're dealing with, it might
     # make sense to not include the point in B' after all. (RM 2017-09-25)
-    # TODO: Factor out the sampling of the os for abstraction. (RM 2017-09-25)""" 
-    # Replace the existing expanded_B method in pbvi.py with this updated version
-
-# Replace the existing expanded_B method in pbvi.py with this updated version
-
-    def expanded_B(self, B):
-        # o_prob[i_b, at+1, ot+1] = P(ot+1 | b, at+1)
-        o_prob = np.rollaxis(np.matmul(B, self._Psi), 0, 3)
-        # The rollaxis restores a convenient shape.
-
-        o_samples = np.empty((len(B), self.n.a), dtype=np.int32)
-        for (i_b, a), _ in np.ndenumerate(o_samples):
-            # Ensure that probabilities sum to 1
-            o_prob_sum = np.sum(o_prob[i_b, a])
-            o_prob_normalized = o_prob[i_b, a] / o_prob_sum if o_prob_sum > 0 else np.ones_like(o_prob[i_b, a]) / self.n.o
-            
-            o_samples[i_b, a] = self.random.choice(self.n.o, p=o_prob_normalized)
-
+    # TODO: Factor out the sampling of the os for abstraction. (RM 2017-09-25)
+    def expanded_B(self,B,actual_observation):
         B_ = list(B)
-        for i_b, b in enumerate(B):
-            Tb_prod = np.tensordot(self.i.T, b, (0, 0))
-            omegas = self.i.Omega[np.arange(self.n.a), :, o_samples[i_b]]
-            b_s = pnormalized(Tb_prod * omegas, axis=1)
-            l1_dists = np.linalg.norm(b_s[:, None] - B_, ord=1, axis=2)
-            min_dists = np.amin(l1_dists, axis=-1)
-            max_min_a = np.argmax(min_dists)
+        for b in B:
+            Tb_prod     = np.tensordot(self.i.T, b, (0, 0))
+            omegas      = self.i.Omega[np.arange(self.n.a), :, actual_observation]
+            b_s         = pnormalized(Tb_prod * omegas, axis=1)
+            l1_dists    = np.linalg.norm(b_s[:,None] - B_, ord=1, axis=2)
+            min_dists   = np.amin(l1_dists, axis=-1)
+            max_min_a   = np.argmax(min_dists, axis=-1)
 
-            if min_dists[max_min_a] > 0:
+            if min_dists[max_min_a] > 1e-3:
                 B_.append(b_s[max_min_a])
+            #print(max_min_a)
 
-        return np.array(B_)
-
-
-    """   def expanded_B(self, B):
+        return np.array(B_) 
+        
+    """ def expanded_B(self, B):
         # o_prob[i_b, at+1, ot+1] = P(ot+1 | b, at+1)
         o_prob = np.rollaxis(np.matmul(B, self._Psi), 0, 3)
         # The rollaxis restores a convenient shape.
@@ -329,7 +295,7 @@ class PBVI(object):
             min_dists   = np.amin(l1_dists, axis=-1)
             max_min_a   = np.argmax(min_dists, axis=-1)
 
-            if min_dists[max_min_a] > 0:
+            if min_dists[max_min_a] > 1e-3:
                 B_.append(b_s[max_min_a])
 
         return np.array(B_) """
