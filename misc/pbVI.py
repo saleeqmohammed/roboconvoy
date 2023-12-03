@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+
 """Point-based Value Iteration for POMDPs.
 
 An implementation of:
@@ -8,8 +8,6 @@ An implementation of:
     (http://ri.cmu.edu/pub_files/pub4/pineau_joelle_2003_3/pineau_joelle_2003_3.pdf)
 """
 
-# TODO: Comment all the NumPy calculations. (RM 2017-09-25)
-# TODO: Finish those naming conventions. (RM 2017-09-23)
 """
 
 Naming conventions (incomplete and partially wrong)
@@ -95,8 +93,7 @@ def _Omega(Omega):
     return np.swapaxes(Omega, -2, -1)[:,:,None].copy()
 
 
-# Note: Calculating this with little use of NumPy for better readability and
-# it's initialization code, so performance doesn't matter.
+
 def _Psi(T, Omega):
     """
     Psi(st, at+1, ot+1) = P(ot+1 | st, at+1)
@@ -121,15 +118,6 @@ Size    = collections.namedtuple("Size", ['s', 'a', 'o'])
 
 
 # pylint: disable=too-many-instance-attributes
-# I've thought about these too-many's and I think it's still okay.
-# Note:
-#  - If the name of an attribute starts with an underscore, it usually
-#    corresponds to a name in the problem or algorithm definition, but is
-#    changed in some way to suit the computation.
-#  - I a name ends with an underscore, it means name'.
-#  - If a name looks like cSomething, it's a function that calculates Something.
-#    I prepend the c only if there would otherwise be a naming conflict between
-#    the global function and the local result.
 class PBVI(object):
     # pylint: disable=too-many-arguments
     def __init__(self, T, Omega, R, gamma, seed=None):
@@ -166,12 +154,7 @@ class PBVI(object):
                         math.log(epsi / (r_max - r_min), self.i.gamma) )))
 
 
-    # MAYBE TODO: It might be possible to do those multiply and sum stuff with
-    # tensordot or einsum. (RM 2017-09-24)
-    # TODO: See whether the use of out= makes sense at all. Does V_ often stay
-    # the same for several steps? When does the array copying start to impact
-    # performance? According to the conclusions, remove the out= stuff here or
-    # introduce it in other places. (RM 2017-09-25)
+
     def Gamma(self, V_):
         if True or self.previous_n_alphas != len(V_):
             self._outs.clear()
@@ -189,8 +172,6 @@ class PBVI(object):
         return l['result']
 
 
-    # TODO: Already here problems arise when B contains only one vector. Fix
-    # that. (RM 2017-10-04)
     def Epsi(self, B, Gamma):
         if True or self.previous_n_bs != len(B):
             self._outs.clear()
@@ -218,10 +199,6 @@ class PBVI(object):
         return l['result']
 
 
-    # TODO: Somehow it doesn't accept when B contains only one vector. Fix that.
-    # (RM 2017-09-27)
-    # MAYBE TODO: See if it makes sense to return the E in a different shape, so
-    # we don't have to do the swapaxes later. (RM 2017-09-18)
     def V(self, Epsi, B):
         l = self._outs['V']
         Epsi = Epsi.swapaxes(0,1)
@@ -255,12 +232,6 @@ class PBVI(object):
         return b_new
 
 
-    # MAYBE TODO: Use broadcasting for calculating the Tb_prod etc. for all bs.
-    # (RM 2017-09-25)
-    # TODO: Check whether the min_dists[…] > 0 makes sense numerically. If it's
-    # close to 0 relative to the size of the space we're dealing with, it might
-    # make sense to not include the point in B' after all. (RM 2017-09-25)
-    # TODO: Factor out the sampling of the os for abstraction. (RM 2017-09-25)
     def expanded_B(self,B,actual_observation):
         B_ = list(B)
         for b in B:
