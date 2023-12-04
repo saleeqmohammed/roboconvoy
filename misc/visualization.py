@@ -14,7 +14,7 @@ robot_i=None
 robot_j =None
 GRID_SIZE=None
 #set goal
-goal_state =12
+goal_state =84
 starting_state=40
 #puth the bot in the world
 
@@ -91,11 +91,10 @@ def move(matrix, index, direction, numbered_state_matrix):
 #create our observer
 def actual_observations_generator():
     # Implement logic to generate actual observations dynamically
-    while True:
-        global robot_i,robot_j
-        #100% accurate obs for now
-        observed_state = numbered_state_matrix[robot_i,robot_j]
-        yield observed_state # Replace with your dynamic generation logic
+    global robot_i,robot_j
+    #100% accurate obs for now
+    observed_state = numbered_state_matrix[robot_i,robot_j]
+    return observed_state # Replace with your dynamic generation logic
 
 """ def observe():
     global character_x,character_y
@@ -191,17 +190,16 @@ V =np.zeros((1,state_matrix.size),np.float64)
 #an important part in pbvi
 T =5
 #Discount factor gamma
-gamma =0.7
+gamma =0.9
 #Now lets define a pbvi object from our pbvi 
 apbvi =pbvi.PBVI(cT,cOmega,cR,gamma)
 
-actual_observations=actual_observations_generator()
 
-pbvi_solver = pbvi.generator(apbvi,V,B,T,actual_observations)
+pbvi_solver = pbvi.generator(apbvi,V,B,T)
 #iterating for set time should be till conveergence
 
 
-#V convergence
+#V convergence not the best!!
 """
 while True:
     V_old =V.copy()
@@ -215,68 +213,76 @@ while True:
 
         break
 """
+
+def find_best_belief_state(Epsi):
+    # Sum the Epsi values over actions and observations for each belief state
+    cumulative_rewards = np.sum(Epsi, axis=(0, 1))
+
+    # Select the belief state index with the highest cumulative reward
+    best_belief_state = np.argmax(cumulative_rewards)
+
+    return best_belief_state
+
+
+
+
 most_probable_belief_old =B[0].copy()
 movement_budget =6
 max_itr=20
-
+V,best_action_for_beliefs_vec ,Gamma,Epsi=next(pbvi_solver)
 for mmt in range(movement_budget):
     itr=0
-    convergence_lim=1e-3
+    # Is this a good idea? should iterate more?
+    convergence_lim=1e-6
     while True:
         #iterate till best belief convergence
         #extimate best action
-        V,best_action_for_beliefs_vec ,Gamma,Epsi=next(pbvi_solver)
-        # After the iterations, find the most probable belief state
+
+    # After the iterations, find the most probable belief state
+
+        #most probable belief
         most_probable_belief_index = np.argmax(np.sum(B, axis=1))
         most_probable_belief = B[most_probable_belief_index]
         bel_err = np.linalg.norm(most_probable_belief_old-most_probable_belief,ord=np.inf)
+
+        #higest reward
+        #most_rewarded =find_best_belief_state(Epsi)
+        #print(f'best reward action: {actions[pbvi.best_action(most_rewarded,V,best_action_for_beliefs_vec)]}')
+        print(Epsi.shape)
+
+
         most_probable_belief_old=most_probable_belief
+        best_action = pbvi.best_action(most_probable_belief,V,best_action_for_beliefs_vec)
         itr+=1
         print(f'iteration:{itr}')
-        
-        
-        #print(f'Epsi:{Epsi.shape}')
-        #print(best_action_for_beliefs_vec.shape)
+        observation = actual_observations_generator()
+        response =[most_probable_belief,best_action,observation]
+        V,best_action_for_beliefs_vec ,Gamma,Epsi=pbvi_solver.send(response)
+        #print(f'observed state{observation}')
+        if observation == goal_state:
+            break
         if bel_err<convergence_lim:
             break
-    #determine best action with most probable belief
+    #determine best action with most probable belief ? or most reward?
     best_action = pbvi.best_action(most_probable_belief,V,best_action_for_beliefs_vec)
-    Gammaas=Gamma[best_action]
-    
     print(f'best action to take:{actions[best_action]}')
 
-
-        # Assuming best_as contains the best action for each belief state
-    # and V is the set of alpha vectors
-
-    # Choose a specific belief state index (change this according to your needs)
-    belief_index = 0
-
-    # Extract the rewards for all actions at the chosen belief state
-    rewards_for_belief = Gamma[:, :, belief_index, :]
-
-    # Get the best action index for the chosen belief state
-    
-
-    # Extract the reward for the best action
-    reward_for_best_action = rewards_for_belief[best_action]
-    print(f'Reward? : {reward_for_best_action.shape}')
-    # Now, reward_for_best_action contains the reward for the best action at the chosen belief state
-
-    
     moved =move(state_matrix,(robot_i,robot_j),actions[best_action],numbered_state_matrix)
+    #if suggeste aciton is possible move the robot
     if moved:
         policy.append(actions[best_action])
-    #take the best action
-    #obsesrvation =move(state_matrix,(robot_i,robot_j),actions[best_action],numbered_state_matrix)
-    #apbvi.update_belief(most_probable_belief,best_action,obsesrvation)
-    observation = next(actual_observations)
-    print(f'observed state{observation}')
+    
+    #once moved make an observation
+    observation = actual_observations_generator()
+    response =[most_probable_belief,best_action,observation]
+    V,best_action_for_beliefs_vec ,Gamma,Epsi=pbvi_solver.send(response)
+    print(f'observed state{ observation}')
     if observation == goal_state:
         break
-    #expand belief_state
+
+    #update he belief state with observations
+
     
-    #B =apbvi.expanded_B(B)
 
 
 

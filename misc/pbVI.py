@@ -28,19 +28,24 @@ import collections
 import math
 
 import numpy as np
-
-def generator(apbvi, V, B, horizon,actual_observations_generator):
+#Let's say no more beliefs than number of states.
+# It would actually make sense to have |A| x|S| ?
+MAX_BELIEFS = 105 
+def generator(apbvi, V, B, horizon):
     while True:
         for _ in range(horizon):
             Gamma       = apbvi.Gamma(V)
             Epsi        = apbvi.Epsi(B, Gamma)
             V, best_as  = apbvi.V(Epsi, B)
 
-        yield V, best_as,Gamma,Epsi
-        
-        actual_observation =next(actual_observations_generator)
+        #yield
         #print(actual_observation)
-        B = apbvi.expanded_B(B,actual_observation)
+        actual_observation =yield  V, best_as,Gamma,Epsi
+        #print(actual_observation)
+        B = apbvi.expanded_B(B)
+        B[-1]=apbvi.update_belief(actual_observation)
+
+
 
 
 def best_action(b, V, best_as):
@@ -103,7 +108,7 @@ def _Psi(T, Omega):
         |O| x |S| x |A|
         ot+1   st   at+1
     """
-    print(Omega.shape)
+    #print(Omega.shape)
     (n_a, n_s, n_o) = Omega.shape
     res = np.empty((n_o, n_s, n_a))
     for (ot1, st, at1), _ in np.ndenumerate(res):
@@ -218,37 +223,10 @@ class PBVI(object):
 
         return rV, l['best_as'][a_inds]
 
-    def update_belief(self, belief, action, obs):
-        m = self.i  #'i' represents the Input namedtuple
-
-        b_new = np.zeros_like(belief)
-        for s_prime in range(self.n.s):  #'n' represents the Size namedtuple
-            p_s_prime = sum(m.T[s, action, s_prime] * belief[s] for s in range(self.n.s))
-            p_o_given_s_prime = m.Omega[action, s_prime, obs]
-            b_new[s_prime] = p_s_prime * p_o_given_s_prime
-
-        # Normalize the updated belief
-        b_new /= np.sum(b_new)
-        return b_new
 
 
-    def expanded_B(self,B,actual_observation):
-        B_ = list(B)
-        for b in B:
-            Tb_prod     = np.tensordot(self.i.T, b, (0, 0))
-            omegas      = self.i.Omega[np.arange(self.n.a), :, actual_observation]
-            b_s         = pnormalized(Tb_prod * omegas, axis=1)
-            l1_dists    = np.linalg.norm(b_s[:,None] - B_, ord=1, axis=2)
-            min_dists   = np.amin(l1_dists, axis=-1)
-            max_min_a   = np.argmax(min_dists, axis=-1)
-
-            if min_dists[max_min_a] > 1e-3:
-                B_.append(b_s[max_min_a])
-            #print(max_min_a)
-
-        return np.array(B_) 
-        
-    """ def expanded_B(self, B):
+    # This is the new expansion. with stochastic sampling!
+    def expanded_B(self, B):
         # o_prob[i_b, at+1, ot+1] = P(ot+1 | b, at+1)
         o_prob = np.rollaxis(np.matmul(B, self._Psi), 0, 3)
         # The rollaxis restores a convenient shape.
@@ -256,8 +234,9 @@ class PBVI(object):
         o_samples = np.empty((len(B), self.n.a), dtype=np.int32)
         for (i_b, a), _ in np.ndenumerate(o_samples):
             o_samples[i_b, a] = self.random.choice(self.n.o, p=o_prob[i_b, a])
-
+        
         B_ = list(B)
+        
         for i_b, b in enumerate(B):
             Tb_prod     = np.tensordot(self.i.T, b, (0, 0))
             omegas      = self.i.Omega[np.arange(self.n.a), :, o_samples[i_b]]
@@ -265,8 +244,29 @@ class PBVI(object):
             l1_dists    = np.linalg.norm(b_s[:,None] - B_, ord=1, axis=2)
             min_dists   = np.amin(l1_dists, axis=-1)
             max_min_a   = np.argmax(min_dists, axis=-1)
-
-            if min_dists[max_min_a] > 1e-3:
+            #Here every belief that is different to the original is added. Should restrict when resources are limited
+            if min_dists[max_min_a] > 0:
                 B_.append(b_s[max_min_a])
+            #Limiting the maximum number of beliefs to maintain
+            if len(B_)>MAX_BELIEFS*4:
+                print("broken!!!!")
+                break
+                
 
-        return np.array(B_) """
+        return np.array(B_)
+
+    def update_belief(self,observation ):
+        m = self.i  # 'i' represents the Input namedtuple
+        belief, action, actual_observation = observation
+        b_new = np.zeros_like(belief)
+        for s_prime in range(self.n.s):  # 'n' represents the Size namedtuple
+            # Update the belief based on the action and actual observation
+            p_s_prime = sum(m.T[s, action, s_prime] * belief[s] for s in range(self.n.s))
+            p_o_given_s_prime = m.Omega[action, s_prime, actual_observation]
+            b_new[s_prime] = p_s_prime * p_o_given_s_prime
+
+        # Normalize the updated belief
+        b_new /= np.sum(b_new)
+        return b_new
+
+

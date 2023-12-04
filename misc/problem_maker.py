@@ -87,13 +87,17 @@ print(move_robot('down',state_matrix,1))
     goal_state =get_indeces(goal_state,state_matrix)
     cR[goal_state[0],goal_state[1]]=40
     return cR """
+def eculidian(state_matrix,state,goal_state):
+    state_idx = get_indeces(state,state_matrix)
+    goal_idx = get_indeces(goal_state,state_matrix)
+    return np.sqrt((state_idx[0]-goal_idx[0])**2 +(state_idx[1]-goal_idx[1])**2 )
 def get_rewards(state_matrix,actions,goal_state):
     #Rewars is |A| x |s|
     #given state, what is the reward for taking action a?
     num_states = state_matrix.size
     num_acitons =len(actions)
     #initialize with -1 reward so that 🤖 does not make unnecessary moves.
-    R=np.ones((num_states,num_acitons))*-1
+    R=np.ones((num_states,num_acitons))*-10
     #for each state if action is possible, 
     # give a reward of -1 
     # else -10 to deter from running into blocks
@@ -107,10 +111,10 @@ def get_rewards(state_matrix,actions,goal_state):
                 new_state_idx =movement[0][1]
                 if get_number_from_indices(state_matrix,new_state_idx)==goal_state:
                     #assign reward 50 to encourage the 🤖 :robot_face
-                    R[state][action]=50
+                    R[state][action]=500
                 else:
                     #set reward to -1
-                    R[state][action]=-1
+                    R[state][action]=-eculidian(state_matrix,state,goal_state)/10
             #⛔for blocked / restricted / non-existing states
             else:
                 R[state][action]=-50
