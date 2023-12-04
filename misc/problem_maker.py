@@ -10,13 +10,15 @@ def normalize_rows_sum_to_1(array):
 grid_size =(3,3)
 
 #define the state_matrix / availability matrix
-state_matrix =np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
-                        [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-                        [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1]])
+state_matrix =np.array([[0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
+                        [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,0],
+                        [0,1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,0],
+                        [0,1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,0],
+                        [0,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,0],
+                        [0,1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1,0],
+                        [0,1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,0],
+                        [0,1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1,0],
+                        [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0]])
 
 #define the actions
 actions={0:'up',1:'down',2:'right',3:'left'}
@@ -121,7 +123,7 @@ def get_rewards(state_matrix,actions,goal_state):
                 if target_coord[0]>0 and target_coord[0]<state_matrix.shape[0] and target_coord[1]>0 and target_coord[1]<state_matrix.shape[1]:
                     #this is a blocked cell
                     R[state][action]=-20
-                R[state][action]=-5000
+                R[state][action]=-500
     eculidian_matrix =np.zeros_like(state_matrix,dtype=np.float64)
     for i in range(state_matrix.shape[0]):
         for j in range(state_matrix.shape[1]):

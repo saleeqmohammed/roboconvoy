@@ -41,7 +41,7 @@ def generator(apbvi, V, B, horizon):
 
         #yield
         #print(actual_observation)
-        actual_observation =yield  V, best_as,B
+        actual_observation =yield  V, best_as
         #print(actual_observation)
         B = apbvi.expanded_B(B)
         #B[-1]=apbvi.update_belief(actual_observation)
