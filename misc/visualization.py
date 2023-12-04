@@ -14,7 +14,7 @@ robot_i=None
 robot_j =None
 GRID_SIZE=None
 #set goal
-goal_state =84
+goal_state =90
 starting_state=40
 #puth the bot in the world
 
@@ -172,14 +172,17 @@ policy=[]
 
 #Lets make our initial belief
 #defining a uniform belief vector
-b1 = np.ones((1,state_matrix.size))
+
 #lets set all the blocked states to zero probability
 availability_vector=state_matrix.copy()
 availability_vector=availability_vector.flatten()
 #b1[availability_vector]=0
 #B=np.stack(b1,b2)
 #do an element wise multiplication
+
 B = np.ones((2,state_matrix.size))
+B[0][starting_state]=1000
+B[1][starting_state]=1000
 B = normalize_2drows_sum_to_1(B)
 
 #Lets generate a value distribution as well
@@ -188,9 +191,9 @@ V =np.zeros((1,state_matrix.size),np.float64)
 
 #🕓we need a Time horizon as well this defines how many steps ahead are we looking
 #an important part in pbvi
-T =5
+T =10
 #Discount factor gamma
-gamma =0.9
+gamma =1
 #Now lets define a pbvi object from our pbvi 
 apbvi =pbvi.PBVI(cT,cOmega,cR,gamma)
 
@@ -227,9 +230,10 @@ def find_best_belief_state(Epsi):
 
 
 most_probable_belief_old =B[0].copy()
-movement_budget =6
+movement_budget =20
 max_itr=20
-V,best_action_for_beliefs_vec ,Gamma,Epsi=next(pbvi_solver)
+V,best_action_for_beliefs_vec ,B=next(pbvi_solver)
+reward =0
 for mmt in range(movement_budget):
     itr=0
     # Is this a good idea? should iterate more?
@@ -239,7 +243,9 @@ for mmt in range(movement_budget):
         #extimate best action
 
     # After the iterations, find the most probable belief state
-
+        print(V.shape)
+        print(best_action_for_beliefs_vec.shape)
+        print(B.shape)
         #most probable belief
         most_probable_belief_index = np.argmax(np.sum(B, axis=1))
         most_probable_belief = B[most_probable_belief_index]
@@ -247,8 +253,10 @@ for mmt in range(movement_budget):
 
         #higest reward
         #most_rewarded =find_best_belief_state(Epsi)
+        #REWARD 
+        
         #print(f'best reward action: {actions[pbvi.best_action(most_rewarded,V,best_action_for_beliefs_vec)]}')
-        print(Epsi.shape)
+    
 
 
         most_probable_belief_old=most_probable_belief
@@ -257,12 +265,16 @@ for mmt in range(movement_budget):
         print(f'iteration:{itr}')
         observation = actual_observations_generator()
         response =[most_probable_belief,best_action,observation]
-        V,best_action_for_beliefs_vec ,Gamma,Epsi=pbvi_solver.send(response)
+        V,best_action_for_beliefs_vec ,B=pbvi_solver.send(response)
+        reward+=cR[observation,best_action]
+        print(f'reward:{reward}')
         #print(f'observed state{observation}')
         if observation == goal_state:
+            print("👑 Goal!!!")
             break
         if bel_err<convergence_lim:
             break
+        
     #determine best action with most probable belief ? or most reward?
     best_action = pbvi.best_action(most_probable_belief,V,best_action_for_beliefs_vec)
     print(f'best action to take:{actions[best_action]}')
@@ -275,9 +287,10 @@ for mmt in range(movement_budget):
     #once moved make an observation
     observation = actual_observations_generator()
     response =[most_probable_belief,best_action,observation]
-    V,best_action_for_beliefs_vec ,Gamma,Epsi=pbvi_solver.send(response)
+    V,best_action_for_beliefs_vec ,B=pbvi_solver.send(response)
     print(f'observed state{ observation}')
     if observation == goal_state:
+        print("👑 Goal!!!")
         break
 
     #update he belief state with observations

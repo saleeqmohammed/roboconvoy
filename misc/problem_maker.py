@@ -97,7 +97,7 @@ def get_rewards(state_matrix,actions,goal_state):
     num_states = state_matrix.size
     num_acitons =len(actions)
     #initialize with -1 reward so that 🤖 does not make unnecessary moves.
-    R=np.ones((num_states,num_acitons))*-10
+    R=np.ones((num_states,num_acitons),dtype=np.float64)*-10
     #for each state if action is possible, 
     # give a reward of -1 
     # else -10 to deter from running into blocks
@@ -111,13 +111,22 @@ def get_rewards(state_matrix,actions,goal_state):
                 new_state_idx =movement[0][1]
                 if get_number_from_indices(state_matrix,new_state_idx)==goal_state:
                     #assign reward 50 to encourage the 🤖 :robot_face
-                    R[state][action]=500
+                    R[state][action]=2350
                 else:
                     #set reward to -1
-                    R[state][action]=-eculidian(state_matrix,state,goal_state)/10
+                    R[state][action]=-eculidian(state_matrix,state,goal_state)/3
             #⛔for blocked / restricted / non-existing states
             else:
-                R[state][action]=-50
+                target_coord = movement[0][1]
+                if target_coord[0]>0 and target_coord[0]<state_matrix.shape[0] and target_coord[1]>0 and target_coord[1]<state_matrix.shape[1]:
+                    #this is a blocked cell
+                    R[state][action]=-20
+                R[state][action]=-5000
+    eculidian_matrix =np.zeros_like(state_matrix,dtype=np.float64)
+    for i in range(state_matrix.shape[0]):
+        for j in range(state_matrix.shape[1]):
+            eculidian_matrix[i,j]=eculidian(state_matrix,get_number_from_indices(state_matrix,(i,j)),goal_state)/1
+    print(eculidian_matrix)
     return R
 
 cR =get_rewards(state_matrix,actions,2)
@@ -127,7 +136,7 @@ def get_transition(state_matrix,actions):
     num_states = state_matrix.size
     num_actions =len(actions)
     num_final_states=num_actions
-    cT =np.zeros((num_states,num_actions,num_states))
+    cT =np.zeros((num_states,num_actions,num_states),dtype=np.float64)
     for starting_state in range(num_states):
         action_final_state_matrix =np.zeros((num_actions,num_final_states))
         #iterate through each action 1up 2down 3right 4left
@@ -160,7 +169,7 @@ def get_Omega(state_matrix,actions):
     num_states =state_matrix.size
     num_observations = num_states
     #if i can move down to a valid state , i have 80% probable final_state for up
-    cOmega = np.ones((num_actions,num_states,num_observations))
+    cOmega = np.ones((num_actions,num_states,num_observations),dtype=np.float64)
     for action in range(num_actions):
         for state in range(num_states):
             #if action is up check if we can move down
@@ -201,7 +210,6 @@ def get_Omega(state_matrix,actions):
 cOmega = get_Omega(state_matrix,actions)
 #print(cOmega)
 #print(cOmega.shape)
-
 
 
 

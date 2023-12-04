@@ -32,6 +32,7 @@ import numpy as np
 # It would actually make sense to have |A| x|S| ?
 MAX_BELIEFS = 105 
 def generator(apbvi, V, B, horizon):
+    
     while True:
         for _ in range(horizon):
             Gamma       = apbvi.Gamma(V)
@@ -40,10 +41,10 @@ def generator(apbvi, V, B, horizon):
 
         #yield
         #print(actual_observation)
-        actual_observation =yield  V, best_as,Gamma,Epsi
+        actual_observation =yield  V, best_as,B
         #print(actual_observation)
         B = apbvi.expanded_B(B)
-        B[-1]=apbvi.update_belief(actual_observation)
+        #B[-1]=apbvi.update_belief(actual_observation)
 
 
 
@@ -236,7 +237,7 @@ class PBVI(object):
             o_samples[i_b, a] = self.random.choice(self.n.o, p=o_prob[i_b, a])
         
         B_ = list(B)
-        
+        max_mins=[]
         for i_b, b in enumerate(B):
             Tb_prod     = np.tensordot(self.i.T, b, (0, 0))
             omegas      = self.i.Omega[np.arange(self.n.a), :, o_samples[i_b]]
@@ -247,10 +248,20 @@ class PBVI(object):
             #Here every belief that is different to the original is added. Should restrict when resources are limited
             if min_dists[max_min_a] > 0:
                 B_.append(b_s[max_min_a])
-            #Limiting the maximum number of beliefs to maintain
-            if len(B_)>MAX_BELIEFS*4:
-                print("broken!!!!")
+                max_mins.append(max_min_a)
+            if len(B_)>MAX_BELIEFS/2:
                 break
+                print("broken!!1")
+                
+        #Limiting the maximum number of beliefs to maintain
+
+        #Now we have a list of beliefs that are distinct.
+        #Lets try getting the fartest ones 
+        #Do a K top pruning
+        #combined = list(zip(max_mins,B_))
+        #sorted_pairs = sorted(combined, key=lambda x: x[0])
+        #max_mins,B_ = zip(*sorted_pairs)
+        #B_ =B[:MAX_BELIEFS]
                 
 
         return np.array(B_)
