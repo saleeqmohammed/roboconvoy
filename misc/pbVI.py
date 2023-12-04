@@ -1,4 +1,4 @@
-
+ 
 """Point-based Value Iteration for POMDPs.
 
 An implementation of:

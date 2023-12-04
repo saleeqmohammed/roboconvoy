@@ -138,7 +138,8 @@ state_matrix =np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
                         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1]])
-state_matrix = pmaker.state_matrix
+
+#state_matrix = pmaker.state_matrix
 #we need to convert the grid to states
 #lets make a numbered state matrix to do this 
 numbered_state_matrix =create_numbered_state_matrix(state_matrix)
@@ -162,13 +163,13 @@ character_x, character_y = GRID_SIZE*(robot_j), (robot_i) * GRID_SIZE
 actions={0:'up',1:'down',2:'right',3:'left'}
 
 #3. T -> Transition matrix 🔀 |S| x |A| x |S'|
-cT =pmaker.get_transition(state_matrix=state_matrix,actions=actions)
+cT =pmaker.get_transition(availability_matrix,actions=actions)
 
 #4. O -> Observation matrix omega |a| x |S| x |O|
-cOmega =pmaker.get_Omega(state_matrix=state_matrix,actions=actions)
+cOmega =pmaker.get_Omega(availability_matrix,actions=actions)
 
 #4. R -> Rewards matrix R |S| x |A|
-cR =pmaker.get_rewards(state_matrix,actions,goal_state)
+cR =pmaker.get_rewards(availability_matrix,actions,goal_state)
 #print(availability_matrix)
 #print(cT)
 #print(cOmega)
@@ -189,14 +190,14 @@ availability_vector=availability_vector.flatten()
 #B=np.stack(b1,b2)
 #do an element wise multiplication
 
-B = np.ones((2,state_matrix.size))
+B = np.ones((2,65))
 B[0][starting_state]=1000
 B[1][starting_state]=1000
 B = normalize_2drows_sum_to_1(B)
 
 #Lets generate a value distribution as well
 #initialize all 0 values
-V =np.zeros((1,state_matrix.size),np.float64)
+V =np.zeros((1,65),np.float64)
 
 #🕓we need a Time horizon as well this defines how many steps ahead are we looking
 #an important part in pbvi
@@ -237,7 +238,7 @@ def find_best_belief_state(Epsi):
 
 
 movement_budget =5
-max_itr=20
+max_itr=0
 V,best_action_for_beliefs_vec=next(pbvi_solver)
 observation=starting_state
 reward =0
@@ -246,7 +247,7 @@ for mmt in range(movement_budget):
     #make an observation to get the belief 🔍
     #this is some wierd stuff get some real observation
 
-    current_belief = np.ones((1,state_matrix.size),dtype=np.float64)
+    current_belief = np.ones((1,65),dtype=np.float64)
     current_belief[0][observation] =1000
     current_belief = current_belief/np.sum(current_belief,axis=0,keepdims=True)
     # V is m X n belief is 1 x n 
@@ -369,12 +370,15 @@ while running:
                 pygame.draw.rect(screen, RED, (col * GRID_SIZE, row * GRID_SIZE, GRID_SIZE, GRID_SIZE), 5)
 
     pygame.draw.rect(screen, BLUE, (character_x, character_y, CHARACTER_SIZE, CHARACTER_SIZE))
+    n=0
     for row in range(len(grid)):
         for col in range(len(grid[row])):
-            font = pygame.font.Font(None, 36)  # You can adjust the font size as needed
-            text = font.render(f"{row * len(grid[row]) + col}", True, BLACK)
-            text_rect = text.get_rect(center=(col * GRID_SIZE + GRID_SIZE // 2, row * GRID_SIZE + GRID_SIZE // 2))
-            screen.blit(text, text_rect)
+            if availability_matrix.T[row,col]:
+                font = pygame.font.Font(None, 36)  # You can adjust the font size as needed
+                text = font.render(f"{n}", True, BLACK)
+                text_rect = text.get_rect(center=(col * GRID_SIZE + GRID_SIZE // 2, row * GRID_SIZE + GRID_SIZE // 2))
+                screen.blit(text, text_rect)
+                n+=1
 
 # Draw character
 #    global character_x,character_y
