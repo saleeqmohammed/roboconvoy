@@ -179,6 +179,8 @@ class PBVI(object):
 
 
     def Epsi(self, B, Gamma):
+        
+
         if True or self.previous_n_bs != len(B):
             self._outs.clear()
             self.previous_n_bs = len(B)
@@ -203,7 +205,8 @@ class PBVI(object):
         # If this is slow, try E.swapaxes(…) += Gamma_ast (Gamma_ast unmodified)
 
         return l['result']
-
+        
+        
 
     def V(self, Epsi, B):
         l = self._outs['V']
@@ -249,7 +252,7 @@ class PBVI(object):
             if min_dists[max_min_a] > 0:
                 B_.append(b_s[max_min_a])
                 max_mins.append(max_min_a)
-            if len(B_)>MAX_BELIEFS/2:
+            if len(B_)>MAX_BELIEFS:
                 break
                 print("broken!!1")
                 

@@ -33,7 +33,7 @@ class Observer:
         self.state_publisher = rospy.Publisher('/state', Int32, queue_size=10)
         self.pose_array_publisher = rospy.Publisher('/pose_array', PoseArray, queue_size=10)
         self.odom_subscriber = rospy.Subscriber('/odom', Odometry, self.odom_callback)
-        self.belief_subscriber = rospy.Subscriber('/belief_state_to_coordinate', String, self.belief_callback)
+        self.belief_subscriber = rospy.Subscribeexpected_stater('/belief_state_to_coordinate', String, self.belief_callback)
         self.rate = rospy.Rate(10)  # 10 Hz
         self.current_pose = None
         self.belief_state_dict = None

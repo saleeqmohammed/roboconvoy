@@ -14,8 +14,8 @@ robot_i=None
 robot_j =None
 GRID_SIZE=None
 #set goal
-goal_state =90
-starting_state=40
+goal_state =46
+starting_state=50
 #puth the bot in the world
 
 #this is the size of the 🤖's world
@@ -181,6 +181,8 @@ availability_vector=availability_vector.flatten()
 #do an element wise multiplication
 
 B = np.ones((2,state_matrix.size))
+#B[0][starting_state]=1000
+#B[1][starting_state]=1000
 
 B = normalize_2drows_sum_to_1(B)
 
@@ -203,7 +205,7 @@ pbvi_solver = pbvi.generator(apbvi,V,B,T)
 
 
 policy=[]
-movement_budget =30
+movement_budget =20
 max_itr=0
 V,best_action_for_beliefs_vec=next(pbvi_solver)
 observation=starting_state
@@ -214,7 +216,7 @@ for mmt in range(movement_budget):
     #this is some wierd stuff get some real observation
 
     current_belief = np.ones((1,105),dtype=np.float64)
-    current_belief[0][observation] =10000
+    current_belief[0][observation] =1000
     current_belief = current_belief/np.sum(current_belief,axis=0,keepdims=True)
     # V is m X n belief is 1 x n 
     current_belief =current_belief.squeeze()
@@ -230,7 +232,7 @@ for mmt in range(movement_budget):
     best_action = best_action_for_beliefs_vec[best_action_index]
 
     #this one for highest value
-    best_action=high_value_action
+    #best_action=high_value_action
 
     #get all the actions, count immediate reward and take the one with highest immediate reward
 #    unique_actions, counts = np.unique(sorted_actions)

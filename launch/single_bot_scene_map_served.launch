@@ -31,6 +31,11 @@
   <!-- <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"> -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy)/data/generated_data/maps_for_server/map_3d_00.yaml"/>
   <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
+  <node pkg="roboconvoy" type="belief_staete_references.py" name ="belief_staete_references" output="screen"/>
+  <node pkg="roboconvoy" type="odom_observer.py" name ="odom_to_state" output="screen"/>
+    <!--node pkg="roboconvoy" type="expected_state_publisher.py" name ="movement_manager_node" output="screen"/-->
+    <node pkg="roboconvoy" type="move_base_final.py" name="move_control" output="screen"/>
+      <!--node pkg="roboconvoy" type="move_robot.py" name ="move_robot" output="screen"/-->
     <!-- Add any additional arguments or parameters if needed -->
   <!-- </include> -->
 </launch>

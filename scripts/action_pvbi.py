@@ -1,11 +1,11 @@
-import pygame
+
 import sys
 import tools.datamanagement as datamanagement
 import numpy as np
 import pomdp.problem_maker as pmaker
 import pomdp.pbVI as pbvi
 import rospy
-import rospy
+
 from std_msgs.msg import Int32,String
 #availability_matrix =datamanagement.load_object("/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/availability_matrix.pickle")
 
@@ -17,12 +17,12 @@ robot_i=None
 robot_j =None
 GRID_SIZE=None
 #set goal
-goal_state =90
-starting_state=40
+goal_state =50
+starting_state=46
 #puth the bot in the world
-
+new_state = starting_state
 #this is the size of the 🤖's world
-
+observation =95
 GRID_SIZE=50
 
 
@@ -141,6 +141,7 @@ numbered_state_matrix =create_numbered_state_matrix(state_matrix)
 
 
 def make_decision(state_matrix,starting_state):
+    
     #Lets solve the POMDP!!! 💪
     #Define S A T O R
     #set robot start conditions
@@ -208,13 +209,13 @@ def make_decision(state_matrix,starting_state):
     movement_budget =30
     max_itr=0
     V,best_action_for_beliefs_vec=next(pbvi_solver)
-    observation=starting_state
+    
     reward =0
     for mmt in range(movement_budget):
         
         #make an observation to get the belief 🔍
         #this is some wierd stuff get some real observation
-
+        global observation
         current_belief = np.ones((1,105),dtype=np.float64)
         current_belief[0][observation] =10000
         current_belief = current_belief/np.sum(current_belief,axis=0,keepdims=True)
@@ -247,11 +248,12 @@ def make_decision(state_matrix,starting_state):
         #if suggeste aciton is possible move the robot
         if moved:
             policy.append(actions[best_action])
-            observation = yield actions[high_value_action]
+            
 
         #once moved make an observation, update the belief space
-        observation = actual_observations_generator()
-        observation_old = observation
+        global new_state
+        new_state = actual_observations_generator()
+        #observation_old = observation
         response =[current_belief,best_action,observation]
         for __ in range(3):
             V,best_action_for_beliefs_vec =pbvi_solver.send(response)
@@ -270,9 +272,10 @@ def make_decision(state_matrix,starting_state):
 
     print("all moved planned / buget expended!")
     print(f'policy: {policy}')
-#do a visualization
-# Initialize Pygame
-if __name__=='__main__':
+
+
+
+def integer_callback(msg, pub):
     state_matrix =np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
                         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
                         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -280,20 +283,18 @@ if __name__=='__main__':
                         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1]])
-    make_decision(state_matrix)
-
-
-
-
-def integer_callback(msg, pub,decision_maker):
-    result = result_publisher(msg.data)
+    result = msg.data
     #sending observaton
-    new_action = decision_maker.send(result)
+    global observation
+    observation = msg.data
+    make_decision(state_matrix,95)
     
     rospy.loginfo(f'Received: {msg.data}, Result: {result}')
     #publish action
-    pub.publish(new_action)
+    global new_state
+    pub.publish(new_state)
     #wait for action to complete before new decision
+
 
 def result_node():
     rospy.init_node('result_node', anonymous=True)
@@ -304,16 +305,24 @@ def result_node():
                         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
                         [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1]])
+    starting_state =48
     #start make_decision generator
-    decision_maker = make_decision(state_matrix,starting_state)
-    action_at_start = next(make_decision)
-    pub = rospy.Publisher('/result_action', String, queue_size=10)
-    rospy.Subscriber('/curr_state', Int32, integer_callback, (pub,decision_maker))
+    global observation
+    observation=starting_state
+    
+    pub = rospy.Publisher('/next_state', Int32, queue_size=10)
+    rospy.Subscriber('/curr_state', Int32, integer_callback, pub)
     rospy.spin()
 
 if __name__ == '__main__':
+    state_matrix =np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
+                        [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1]])
     try:
-        
         result_node()
     except rospy.ROSInterruptException:
         pass

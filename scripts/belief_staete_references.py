@@ -8,7 +8,7 @@ floor_plan = "/home/saleeq/Desktop/new_map_planning_1.png"
 availability_matrix, centers_dict,state_ref = beliefgen.get_states(floor_plan)
 def publish_dictionary():
     # Initialize the ROS node
-    rospy.init_node('belief_state_referecnce', anonymous=True)
+    rospy.init_node('belief_state_referecnce', anonymous=False)
 
     # Create a publisher for the dictionary on the desired topic
     pub = rospy.Publisher('/belief_state_to_coordinate', String, queue_size=10)
@@ -17,7 +17,7 @@ def publish_dictionary():
     availability_matrix, centers_dict,state_ref = beliefgen.get_states(floor_plan)
     # Create a dictionary to publish
     dictionary_to_publish = state_ref
-
+    print(dictionary_to_publish)
     # Rate at which to publish (e.g., 1 Hz)
     rate = rospy.Rate(1)
 

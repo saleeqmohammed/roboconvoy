@@ -59,6 +59,7 @@ class Observer:
         self.current_pose = None
         self.expected_pose = None
         self.belief_state_dict = None
+        self.bel_state_coords=None
 
     def belief_callback(self, belief_dict):
         self.belief_state_dict = json.loads(belief_dict.data)
@@ -74,14 +75,16 @@ class Observer:
         while not rospy.is_shutdown():
             while self.current_pose is not None and self.belief_state_dict is not None:
                 belief_dict = self.belief_state_dict
+                self.bel_state_coords =list(belief_dict.values())
                 coordinates_to_states = list(belief_dict.values())
                 min_coordinate = coordinates_to_states[0]
                 for coordinate in coordinates_to_states:
                     if get_distance_from_pose_and_coordinate(self.current_pose, coordinate) < get_distance_from_pose_and_coordinate(self.current_pose, min_coordinate):
                         min_coordinate = coordinate
                 state = get_key_by_value(self.belief_state_dict, min_coordinate)
-                rospy.loginfo(f'state: {state} , coordinate: {min_coordinate}')
-                self.state_publisher.publish(Int32(state))  # Added state as argument
+                #rospy.loginfo(f'state: {state} , coordinate: {min_coordinate}')
+                
+                self.state_publisher.publish(int(state))  # Added state as argument
                 self.rate.sleep()
 
     def run(self):
