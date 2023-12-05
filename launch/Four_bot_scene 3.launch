@@ -1,0 +1,67 @@
+<launch>
+  <!-- Robot 4 -->
+  <arg name="model_4" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos_4" default="2"/>
+  <arg name="y_pos_4" default="2"/>
+  <arg name="z_pos_4" default="0"/>
+  <param name="robot_description_4" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model_4).urdf.xacro" />
+  <node name="spawn_urdf_4" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3_4 -x $(arg x_pos_4) -y $(arg y_pos_4) -z $(arg z_pos_4) -param robot_description_4" />
+
+  <!-- Robot 3 -->
+  <arg name="model_3" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos_3" default="-3"/>
+  <arg name="y_pos_3" default="1"/>
+  <arg name="z_pos_3" default="0"/>
+  <param name="robot_description_3" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model_3).urdf.xacro" />
+  <node name="spawn_urdf_3" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3_3 -x $(arg x_pos_3) -y $(arg y_pos_3) -z $(arg z_pos_3) -param robot_description_3" />
+
+  <!-- Robot 2 -->
+  <arg name="model_2" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos_2" default="-2"/>
+  <arg name="y_pos_2" default="-1"/>
+  <arg name="z_pos_2" default="0"/>
+  <param name="robot_description_2" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model_2).urdf.xacro" />
+  <node name="spawn_urdf_2" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3_2 -x $(arg x_pos_2) -y $(arg y_pos_2) -z $(arg z_pos_2) -param robot_description_2" />
+
+  <!-- Robot 1 -->
+  <arg name="model_1" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos_1" default="1"/>
+  <arg name="y_pos_1" default="1"/>
+  <arg name="z_pos_1" default="0"/>
+  <param name="robot_description_1" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model_1).urdf.xacro" />
+  <node name="spawn_urdf_1" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3_1 -x $(arg x_pos_1) -y $(arg y_pos_1) -z $(arg z_pos_1) -param robot_description_1" />
+
+
+<!-- Spawn the box in Gazebo -->
+<node name="spawn_urdf_box" pkg="gazebo_ros" type="spawn_model"
+      args="-urdf -file $(find roboconvoy)/data/turtlebot3_facade_1.urdf -x 1 -y 2 -z 0 -model box"/>
+
+
+
+<!--house-->
+   
+<!--rviz gazebo-->
+    
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find roboconvoy)/data/generated_data/3dworlds/newmodel.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="false"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+  
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+    <arg name="model" value="$(arg model_1)"/>
+  </include>
+  
+
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
+
+  <!-- Include gmapping launch file -->
+  <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch">
+    <!-- Add any additional arguments or parameters if needed -->
+  </include>
+</launch>
+

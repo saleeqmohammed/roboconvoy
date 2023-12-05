@@ -84,7 +84,7 @@ def state_matrix_generator(map_img):
 
             center_x = (start_x + end_x) // 2
             center_y = (start_y + end_y) // 2
-            img_references[n_cell]=(center_x*map_resolution,center_y*map_resolution,)
+            img_references[n_cell]=(center_y*map_resolution,center_x*map_resolution)
 
             if np.sum(padded_map[start_y:end_y, start_x:end_x]) > (255 * grid ** 2 - 1) * 0.99:
                 # allowed cells
@@ -131,7 +131,7 @@ def get_states(map_image_path: String):  # type: ignore
 
 image_path = "/home/saleeq/Desktop/new_map_planning_1.png"
 state_matrix,centers_dict,img_ref =get_states(image_path)
-#print(img_ref)
+print(img_ref)
 """ state_matrix, centers_dict,img_ref = get_states(image_path)
 
 # Print centers as a dictionary
