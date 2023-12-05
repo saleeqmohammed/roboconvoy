@@ -43,7 +43,7 @@ def trim_whitespace(image_path):
     y2 = bottom_right[1]
 
     # print(bin_image)
-    cv2.imshow("Trimmed Image", img[x:x2, y:y2])
+    #cv2.imshow("Trimmed Image", img[x:x2, y:y2])
     return img[x:x2, y:y2]
 
 
@@ -73,6 +73,7 @@ def state_matrix_generator(map_img):
     padded_map[:y_dim, :x_dim] = map_img
     image_bgr = cv2.cvtColor(padded_map, cv2.COLOR_GRAY2BGR)
     n_cell =0
+
     img_references ={}
     for cell_y in range(1,n_cells_y-1):
         for cell_x in range(1,n_cells_x-1):
@@ -83,7 +84,7 @@ def state_matrix_generator(map_img):
 
             center_x = (start_x + end_x) // 2
             center_y = (start_y + end_y) // 2
-            
+            img_references[n_cell]=(center_x*map_resolution,center_y*map_resolution,)
 
             if np.sum(padded_map[start_y:end_y, start_x:end_x]) > (255 * grid ** 2 - 1) * 0.99:
                 # allowed cells
@@ -91,21 +92,19 @@ def state_matrix_generator(map_img):
                 cv2.circle(image_bgr, (center_x, center_y), 2, (0, 0, 255), -1)  # Add a dot at the center
                 state_matrix[cell_x, cell_y] = 1
                 centers_dict[(center_x*map_resolution, center_y*map_resolution)] = 1
-                img_references[n_cell]=(center_x*map_resolution, center_y*map_resolution)
+                
                 #add labels
-                label = f's{n_cell}'
-                n_cell+=1
-                cv2.putText(image_bgr, label, (center_x - 5, center_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.3,
-                            (255, 0, 0), 1, cv2.LINE_AA)
+                
+                
             else:
                 cv2.rectangle(image_bgr, (start_x, start_y), (end_x, end_y), (0, 0, 100), -1)
                 #just don't add extra states
                 #centers_dict[(center_x*map_resolution, center_y*map_resolution)] = 0
-
+            n_cell+=1
     
-    cv2.imshow("Grid", image_bgr)
-    cv2.imwrite("/home/saleeq/Desktop/grid_map.png", image_bgr)
-    state_matrix = state_matrix
+    #cv2.imshow("Grid", image_bgr)
+    #cv2.imwrite("/home/saleeq/Desktop/grid_map.png", image_bgr)
+    #state_matrix = state_matrix
 
     return state_matrix, centers_dict, img_references
 
@@ -113,23 +112,26 @@ def state_matrix_generator(map_img):
 def display_maps(result):
     if result is not None:
         # Display the original and modified images
-        cv2.imshow("Original Image", cv2.imread(image_path, cv2.IMREAD_GRAYSCALE))
-        cv2.imshow("Modified Image", result)
+        #cv2.imshow("Original Image", cv2.imread(image_path, cv2.IMREAD_GRAYSCALE))
+        #cv2.imshow("Modified Image", result)
         # print(result)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
+        pass
+    pass
 
 def get_states(map_image_path: String):  # type: ignore
     trimmed_image = trim_whitespace(map_image_path)
     state_matrix, centers_dict ,img_ref= state_matrix_generator(trimmed_image)
     state_matrix = state_matrix.T 
     state_matrix = state_matrix[1:-1,1:-1]
+    print(state_matrix)
     return state_matrix, centers_dict,img_ref
 
 
 image_path = "/home/saleeq/Desktop/new_map_planning_1.png"
-
+state_matrix,centers_dict,img_ref =get_states(image_path)
+#print(img_ref)
 """ state_matrix, centers_dict,img_ref = get_states(image_path)
 
 # Print centers as a dictionary

@@ -97,7 +97,7 @@ def eculidian(availability_matrix,state,goal_state):
     goal_idx = find_nth_one(goal_state,availability_matrix)
     return np.sqrt((state_idx[0]-goal_idx[0])**2 +(state_idx[1]-goal_idx[1])**2 )
 def get_rewards(availability_matrix,actions,goal_state):
-    #Rewars is |A| x |s|
+    #Rewars is |s| x A| 
     #given state, what is the reward for taking action a?
     num_states = np.count_nonzero(availability_matrix)+1 #s_i U s_term
     s_term=num_states-1
