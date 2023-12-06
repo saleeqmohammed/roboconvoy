@@ -22,12 +22,12 @@ class MoveRobot:
         #self.goal_subscriber = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.goal_callback)
         self.rate = rospy.Rate(10)  # 10 Hz
         self.current_pose = None
-        self.goal_pose = None
+        self.goal_pose = Pose()
         self.curr_state =None
         self.belief_state_dict =None
         self.belief_state_coords =None
         self.move_completed =False
-        self.expected_state = None
+        self.expected_state = 95
     def curr_state_callback(self,msg):
         self.curr_state = msg.data
     def belief_callback(self, belief_dict):
@@ -41,22 +41,23 @@ class MoveRobot:
         if self.curr_state != expected_state.data:
             self.move_completed = False
             self.expected_state = expected_state.data
-            goal_pose = Pose()
+            self.goal_pose = Pose()
             #print(expected_state.data)
-            coordinate = self.belief_state_coords[expected_state.data]
+            coordinate = self.belief_state_coords[self.expected_state]
             coordinate_x = -(coordinate[0] - 3)
             coordinate_y = -(coordinate[1]- 6.5)
-            goal_pose.position.x = coordinate_x
-            goal_pose.position.y = coordinate_y
+            self.goal_pose.position.x = coordinate_x
+            self.goal_pose.position.y = coordinate_y
             curr_coordinates =self.belief_state_coords[self.curr_state]
             curr_coordinates_yy =-(curr_coordinates[1]- 6.5)
             curr_coordinates_xx =-(curr_coordinates[0]- 3)
             angle =atan2( coordinate_y-curr_coordinates_yy, coordinate_x-curr_coordinates_xx)
-            goal_pose.orientation = rotateQuaternion(Quaternion(w=1.0),angle)
+            self.goal_pose.orientation = rotateQuaternion(Quaternion(w=1.0),angle)
         else:
             self.move_completed=True
+
             #rospy.loginfo(f'current state{self.curr_state.data} expected state:{self.expected_state.data}')
-        self.goal_pose = goal_pose
+        
 
     def get_distance_to_goal(self):
         if self.current_pose is not None and self.goal_pose is not None:
@@ -92,7 +93,7 @@ class MoveRobot:
         angular_speed = 0.5  # Adjust as needed
 
         while not rospy.is_shutdown():
-            while self.goal_pose is None and not rospy.is_shutdown():
+            while self.expected_state is None and self.goal_pose is None and not rospy.is_shutdown():
                 self.rate.sleep()
 
             rospy.loginfo(f'Moving to state {self.expected_state}')

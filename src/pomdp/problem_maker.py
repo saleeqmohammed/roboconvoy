@@ -114,7 +114,7 @@ def get_rewards(state_matrix,actions,goal_state):
                     R[state][action]=2500
                 else:
                     #set reward to -1
-                    R[state][action]=-1#-eculidian(state_matrix,state,goal_state)/2
+                    R[state][action]=-eculidian(state_matrix,state,goal_state)/2
             #⛔for blocked / restricted / non-existing states
             else:
                 target_coord = movement[0][1]

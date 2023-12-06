@@ -5,7 +5,8 @@ import numpy as np
 import problem_maker as pmaker
 import pbVI as pbvi
 #availability_matrix =datamanagement.load_object("/home/saleeq/catkin_ws/src/roboconvoy/src/pomdp/availability_matrix.pickle")
-
+import rospy
+from std_msgs.msg import Int32
 ###############################################################################################
 #Define global variable for character_x,character_y
 character_x = None
@@ -15,14 +16,14 @@ robot_j =None
 GRID_SIZE=None
 #set goal
 goal_state =46
-starting_state=50
+starting_state=95
 #puth the bot in the world
 
 #this is the size of the 🤖's world
 
 GRID_SIZE=50
 
-
+rospy.init_node("pvbi_node")
 #  DEFINE A FEW HELPER FUNCTIONS
 #Define a funciton to normalize our belief 💡
 def get_indeces(state_number,state_matrix):
@@ -195,7 +196,7 @@ V =np.zeros((1,state_matrix.size),np.float64)
 
 T =4
 #Discount factor gamma
-gamma =1
+gamma =0.8
 #Now lets define a pbvi object from our pbvi 
 apbvi =pbvi.PBVI(cT,cOmega,cR,gamma)
 
@@ -235,17 +236,19 @@ for mmt in range(movement_budget):
     #best_action=high_value_action
 
     #get all the actions, count immediate reward and take the one with highest immediate reward
-#    unique_actions, counts = np.unique(sorted_actions)
-#    immediate_reward_weight = [cR[observation,action]*count for count,action in zip(unique_actions,counts)]
+    unique_actions, counts = np.unique(sorted_actions)
+    immediate_reward_weight = [cR[observation,action]*count for count,action in zip(unique_actions,counts)]
 
     #sort this
-    #best_action=high_value_action
+    best_action=high_value_action
     print(f'best action to take:{actions[best_action]}')
     #take best action
     moved =move(state_matrix,(robot_i,robot_j),actions[best_action],numbered_state_matrix)
     #if suggeste aciton is possible move the robot
     if moved:
         policy.append(actions[best_action])
+        expected_state_publisher = rospy.Publisher('/expected_state', Int32, queue_size=10)
+        expected_state_publisher.publish(actual_observations_generator())
     
     #once moved make an observation, update the belief space
     observation = actual_observations_generator()

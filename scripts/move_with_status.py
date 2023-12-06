@@ -12,7 +12,7 @@ class MoveRobot:
         rospy.init_node('move_robot_node', anonymous=False)
         self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.odom_subscriber = rospy.Subscriber('/odom', Odometry, self.odom_callback)
-        self.goal_subscriber = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.goal_callback)
+        self.goal_subscriber = rospy.Subscriber('/goal', PoseStamped, self.goal_callback)
         self.move_completed_publisher = rospy.Publisher('/move_completed', Bool, queue_size=10)  # New publisher
         self.rate = rospy.Rate(10)  # 10 Hz
         self.current_pose = None
@@ -22,6 +22,7 @@ class MoveRobot:
         self.current_pose = odom_msg.pose.pose
 
     def goal_callback(self, goal_msg):
+        rospy.loginfo(goal_msg.pose)
         self.goal_pose = goal_msg.pose
 
     def get_distance_to_goal(self):

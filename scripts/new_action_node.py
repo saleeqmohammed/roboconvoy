@@ -1,49 +1,46 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from std_msgs.msg import Bool, Int32
 
-class ExampleNode:
+class MyNode:
     def __init__(self):
-        rospy.init_node('example_node', anonymous=True)
+        rospy.init_node('my_node', anonymous=True)
+        
+        self.flag = False
+        self.previous_value = 0
+        self.rate = rospy.Rate(1)  # 1 Hz, adjust as needed
 
-        self.boolean_status = False
-        self.integer_value = 0
+        # Subscribe to the boolean flag topic
+        rospy.Subscriber('/moved_status', Bool, self.flag_callback)
 
-        # Subscriber to boolean status
-        rospy.Subscriber('/moved_status', Bool, self.boolean_status_callback)
+        # Create a publisher for the calculated value
+        self.value_publisher = rospy.Publisher('/expected_state', Int32, queue_size=10)
 
-        # Publisher for integer topic
-        self.integer_pub = rospy.Publisher('/expected_state', Int32, queue_size=10)
+    def flag_callback(self, msg):
+        # Update flag when a new message is received
+        self.flag = msg.data
 
-        # Run the main loop
-        self.run()
-
-    def boolean_status_callback(self, msg):
-        self.boolean_status = msg.data
+    def calculate_value(self):
+        # Replace this with your actual calculation logic
+        return 42
 
     def run(self):
-        rate = rospy.Rate(10)  # 10 Hz
         while not rospy.is_shutdown():
-            if not self.boolean_status:
-                # Run your function here
-                #self.run_function()
-
-                # Publish the current integer value
-                self.integer_pub.publish(self.integer_value)
+            if self.flag:
+                # If flag is true, calculate and publish new value
+                new_value = self.calculate_value()
+                self.value_publisher.publish(new_value)
+                self.previous_value = new_value
             else:
-                # Boolean status is true, update the integer value
-                self.integer_value -=1
-                self.integer_pub.publish(self.integer_value)
+                # If flag is false, keep publishing previous value
+                self.value_publisher.publish(self.previous_value)
 
-            rate.sleep()
-
-    def run_function(self):
-        # Replace this with your own function to run while boolean status is false
-        print("Running function...")
+            self.rate.sleep()
 
 if __name__ == '__main__':
     try:
-        example_node = ExampleNode()
+        node = MyNode()
+        node.run()
     except rospy.ROSInterruptException:
         pass

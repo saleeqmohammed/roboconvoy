@@ -10,7 +10,7 @@
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <!--set to true to visualize-->
-    <arg name="gui" value="false"/>
+    <arg name="gui" value="true"/>
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
@@ -26,7 +26,26 @@
   </include>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
-
+  <gazebo>
+    <model name="green_box">
+      <pose>0 0 1 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </gazebo>
   <!-- Include gmapping launch file -->
   <!-- <include file="$(find turtlebot3_slam)/launch/turtlebot3_gmapping.launch"> -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find roboconvoy)/data/generated_data/maps_for_server/map_3d_00.yaml"/>
@@ -34,8 +53,9 @@
   <node pkg="roboconvoy" type="belief_staete_references.py" name ="belief_staete_references" output="screen"/>
   <node pkg="roboconvoy" type="odom_observer.py" name ="odom_to_state" output="screen"/>
     <!--node pkg="roboconvoy" type="expected_state_publisher.py" name ="movement_manager_node" output="screen"/-->
-    <node pkg="roboconvoy" type="move_base_final.py" name="move_control" output="screen"/>
-      <!--node pkg="roboconvoy" type="move_robot.py" name ="move_robot" output="screen"/-->
+    <!--node pkg="roboconvoy" type="move_base_with_status.py" name="move_control" output="screen"/-->
+      <node pkg="roboconvoy" type="pvbi_runner.py" name ="driver" output="screen"/>
+      <node pkg="roboconvoy" type="move_robot.py" name ="move_robot" output="screen"/>
     <!-- Add any additional arguments or parameters if needed -->
   <!-- </include> -->
 </launch>
